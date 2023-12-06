@@ -22,7 +22,7 @@ on:
 
 # Declare default permissions as read only.
 permissions: 
-  security-events: write
+  security-events: read
   contents: read
 
 jobs:
