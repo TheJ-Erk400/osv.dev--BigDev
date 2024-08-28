@@ -1,0 +1,1453 @@
+repo_name: Huntemall/osv.dev--BigDev-
+report_id: 2065ca84d12774612bd3466d78743165
+version: 0.1
+repo_type: Public
+timestamp: '2024-07-16T10:07:15+00:00'
+requested_by: Huntemall
+provider: github
+branch: dev
+detected_tools_count: 104
+tools:
+- name: Golang
+  description: An open source programming language that makes it easy to build simple,
+    reliable, and efficient software
+  website_url: http://golang.org/
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/1005/O6AczwfV_400x400.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-
+  detection_source: Repo Metadata
+- name: Java
+  description: A concurrent, class-based, object-oriented, language specifically designed
+    to have as few implementation dependencies as possible
+  website_url: https://www.java.com
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/995/K85ZWV2F.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/Dockerfile
+  detection_source: gcp/appengine/Dockerfile
+  last_updated_by: Michael Kedar
+  last_updated_on: 2023-08-17 04:40:47.000000000 Z
+- name: JavaScript
+  description: Lightweight, interpreted, object-oriented language with first-class
+    functions
+  website_url: https://developer.mozilla.org/en-US/docs/Web/JavaScript
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/1209/javascript.jpeg
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-
+  detection_source: Repo Metadata
+- name: Python
+  description: A clear and powerful object-oriented programming language, comparable
+    to Perl, Ruby, Scheme, or Java.
+  website_url: https://www.python.org
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/993/pUBY5pVj.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-
+  detection_source: Repo Metadata
+- name: Ruby
+  description: A dynamic, interpreted, open source programming language with a focus
+    on simplicity and productivity
+  website_url: https://www.ruby-lang.org
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/989/ruby.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docs/Gemfile
+  detection_source: docs/Gemfile
+  last_updated_by: Hayley Denbraver
+  last_updated_on: 2023-04-12 01:39:48.000000000 Z
+- name: SQL
+  description: It is a domain-specific language used in programming
+  website_url: https://en.wikipedia.org/wiki/SQL
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/2271/default_068d33483bba6b81ee13fbd4dc7aab9780896a54.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/vulnfeeds/pypi/pypi_links.sql
+  detection_source: vulnfeeds/pypi/pypi_links.sql
+  last_updated_by: Oliver Chang
+  last_updated_on: 2021-04-08 23:20:32.000000000 Z
+- name: Flask
+  description: A microframework for Python based on Werkzeug, Jinja 2 and good intentions
+  website_url: http://flask.pocoo.org/
+  version: 2.3.3
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Microframeworks (Backend)
+  image_url: https://img.stackshare.io/service/1001/default_6d109315b60108628b7cd3e159b84645c31ef0e2.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/Pipfile
+  detection_source: gcp/appengine/Pipfile
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-10-25 05:42:39.000000000 Z
+- name: Lit
+  description: "441 byte responsive \U0001F525 CSS framework"
+  website_url: https://ajusa.github.io/lit/
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Front-End Frameworks
+  image_url: https://img.stackshare.io/no-img-open-source.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/frontend3/package.json
+  detection_source: gcp/appengine/frontend3/package.json
+  last_updated_by: Richard Wang
+  last_updated_on: 2022-01-27 04:13:30.000000000 Z
+- name: Node.js
+  description: A platform built on Chrome's JavaScript runtime for easily building
+    fast, scalable network applications
+  website_url: http://nodejs.org/
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Frameworks (Full Stack)
+  image_url: https://img.stackshare.io/service/1011/n1JRsFeB_400x400.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/Dockerfile
+  detection_source: gcp/appengine/Dockerfile
+  last_updated_by: Michael Kedar
+  last_updated_on: 2023-08-17 04:40:47.000000000 Z
+- name: Protobuf
+  description: Google's data interchange format
+  website_url: https://developers.google.com/protocol-buffers/
+  version: 4.25.0
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Serialization Frameworks
+  image_url: https://img.stackshare.io/service/4393/ma2jqJKH_400x400.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Rex P
+  last_updated_on: 2023-09-26 06:17:27.000000000 Z
+- name: Sass
+  description: Syntactically Awesome Style Sheets
+  website_url: http://sass-lang.com/
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: CSS Pre-processors / Extensions
+  image_url: https://img.stackshare.io/service/1171/jCR2zNJV.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/frontend3/package.json
+  detection_source: gcp/appengine/frontend3/package.json
+  last_updated_by: Richard Wang
+  last_updated_on: 2022-01-27 04:13:30.000000000 Z
+- name: css-loader
+  description: Helps webpack to collect CSS from all the css files
+  website_url: https://github.com/webpack-contrib/css-loader
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: CSS Pre-processors / Extensions
+  image_url: https://img.stackshare.io/service/8074/default_d2b16fd6997fb2e164de645a34f9b8d5a880d999.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/frontend3/package.json
+  detection_source: gcp/appengine/frontend3/package.json
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-05-31 06:46:51.000000000 Z
+- name: gRPC
+  description: A high performance, open-source universal RPC framework
+  website_url: https://grpc.io/
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Remote Procedure Call (RPC)
+  image_url: https://img.stackshare.io/service/4670/default_d811b0ac72205af84aca21f967594338580be913.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.mod
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Martin Sablotny
+  last_updated_on: 2022-08-15 00:43:30.000000000 Z
+- name: Google Cloud Storage
+  description: Durable and highly available object storage service
+  website_url: https://cloud.google.com/products/cloud-storage/
+  open_source: false
+  hosted_saas: true
+  category: Data Stores
+  sub_category: Cloud Storage
+  image_url: https://img.stackshare.io/service/694/Cloud_Storage.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.mod
+  detection_source: docker/indexer/go.mod
+  last_updated_by: dependabot[bot]
+  last_updated_on: 2023-10-26 02:39:35.000000000 Z
+- name: Redis
+  description: Open source (BSD licensed), in-memory data structure store
+  website_url: http://redis.io/
+  version: 5.0.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Data Stores
+  sub_category: In-Memory Databases
+  image_url: https://img.stackshare.io/service/1031/default_cbce472cd134adc6688572f999e9122b9657d4ba.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: docker/worker/Pipfile
+  last_updated_by: Rex P
+  last_updated_on: 2022-07-07 01:30:29.000000000 Z
+- name: Docker
+  description: Enterprise Container Platform for High-Velocity Innovation.
+  website_url: https://www.docker.com/
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Virtual Machine Platforms & Containers
+  image_url: https://img.stackshare.io/service/586/n4u37v9t_400x400.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-
+  detection_source: Repo Metadata
+- name: Git
+  description: Fast, scalable, distributed revision control system
+  website_url: http://git-scm.com/
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Version Control System
+  image_url: https://img.stackshare.io/service/1046/git.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-
+  detection_source: Repo Metadata
+- name: GitHub Actions
+  description: Automate your workflow from idea to production
+  website_url: https://github.com/features/actions
+  open_source: false
+  hosted_saas: true
+  category: Build, Test, Deploy
+  sub_category: Continuous Integration
+  image_url: https://img.stackshare.io/service/11563/actions.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/.github/workflows/codeql-analysis.yml
+  detection_source: ".github/workflows/codeql-analysis.yml"
+  last_updated_by: Rex P
+  last_updated_on: 2022-11-22 04:16:23.000000000 Z
+- name: Google Cloud Build
+  description: Continuously build, test, and deploy.
+  website_url: https://cloud.google.com/cloud-build
+  open_source: false
+  hosted_saas: true
+  category: Build, Test, Deploy
+  sub_category: Continuous Deployment
+  image_url: https://img.stackshare.io/service/9309/PoHJY3K8_400x400.jpg
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/cloudbuild.yaml
+  detection_source: cloudbuild.yaml
+  last_updated_by: Oliver Chang
+  last_updated_on: 2021-01-08 01:57:50.000000000 Z
+- name: Gunicorn
+  description: A Python WSGI HTTP Server for UNIX
+  website_url: http://gunicorn.org/
+  version: 21.2.0
+  open_source: true
+  hosted_saas: false
+  category: Application Hosting
+  sub_category: Web Servers
+  image_url: https://img.stackshare.io/service/1091/gunicorn.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/Pipfile.lock
+  detection_source: gcp/appengine/Pipfile
+  last_updated_by: Michael Kedar
+  last_updated_on: 2023-08-17 04:40:47.000000000 Z
+- name: OpenCensus
+  description: A single distribution of libraries that automatically collect traces
+    and send them to any backend
+  website_url: https://opencensus.io/
+  open_source: false
+  hosted_saas: false
+  category: Monitoring
+  sub_category: Performance Monitoring
+  image_url: https://img.stackshare.io/service/10794/EpBd2Xrw_400x400.jpg
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.mod
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2022-12-05 03:50:58.000000000 Z
+- name: PyPI
+  description: A repository of software for the Python programming language
+  website_url: https://pypi.org/
+  open_source: false
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Hosted Package Repository
+  image_url: https://img.stackshare.io/service/12572/-RIWgodF_400x400.jpg
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/vulnfeeds/tools/debian/debian_converter/Pipfile
+  detection_source: vulnfeeds/tools/debian/debian_converter/Pipfile
+  last_updated_by: Rex P
+  last_updated_on: 2023-02-08 01:30:07.000000000 Z
+- name: Pylint
+  description: Source-code, bug and quality checker for the Python programming language
+  website_url: https://www.pylint.org/
+  version: 3.0.2
+  license: GPL-2.0
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Code Review
+  image_url: https://img.stackshare.io/service/4837/py.jpg
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: Pipfile
+  last_updated_by: Oliver Chang
+  last_updated_on: 2022-07-13 00:27:09.000000000 Z
+- name: RubyGems
+  description: Easily download, install, and use ruby software packages on your system
+  website_url: https://rubygems.org/
+  open_source: false
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Package Managers
+  image_url: https://img.stackshare.io/service/12795/5jL6-BA5_400x400.jpeg
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docs/Gemfile
+  detection_source: docs/Gemfile
+  last_updated_by: Hayley Denbraver
+  last_updated_on: 2023-04-12 01:39:48.000000000 Z
+- name: Terraform
+  description: Describe your complete infrastructure as code and build resources across
+    providers
+  website_url: https://www.terraform.io/
+  license: MPL-2.0
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Server Configuration and Automation
+  image_url: https://img.stackshare.io/service/1276/default_2316907c4199f912e2ed79cbdb99025c9e5e2665.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/deployment/terraform/modules/osv/gcp_apis.tf
+  detection_source: deployment/terraform/modules/osv/gcp_apis.tf
+  last_updated_by: Michael Kedar
+  last_updated_on: 2023-01-04 06:13:30.000000000 Z
+- name: Terraform Registry
+  description: Describe your complete infrastructure as code and build resources across
+    providers
+  website_url: https://registry.terraform.io/
+  license: MPL-2.0
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Package Managers
+  image_url: https://img.stackshare.io/package_manager/49093/default_cdf079d244bded073d455911e6ce679abb1b77ab.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/deployment/terraform/modules/osv/gcp_apis.tf
+  detection_source: deployment/terraform/modules/osv/gcp_apis.tf
+  last_updated_by: Michael Kedar
+  last_updated_on: 2023-01-04 06:13:30.000000000 Z
+- name: Webpack
+  description: A bundler for javascript and friends
+  website_url: http://webpack.js.org
+  version: 5.89.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: JS Build Tools / JS Task Runners
+  image_url: https://img.stackshare.io/service/1682/IMG_4636.PNG
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/frontend3/package-lock.json
+  detection_source: gcp/appengine/frontend3/package.json
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-12-05 00:40:38.000000000 Z
+- name: npm
+  description: The package manager for JavaScript.
+  website_url: https://www.npmjs.com/
+  open_source: false
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Front End Package Manager
+  image_url: https://img.stackshare.io/service/1120/lejvzrnlpb308aftn31u.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/frontend3/package.json
+  detection_source: gcp/appengine/frontend3/package.json
+  last_updated_by: Richard Wang
+  last_updated_on: 2022-01-27 04:13:30.000000000 Z
+- name: Here Maps
+  description: An app that makes city navigation effortless whether you need a taxi,
+    public transportation or drive on your own
+  website_url: http://here.com/
+  open_source: false
+  hosted_saas: true
+  category: Application Utilities
+  sub_category: Mapping APIs
+  image_url: https://img.stackshare.io/service/5500/FyXhxpvJ_400x400.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/Dockerfile
+  detection_source: gcp/appengine/Dockerfile
+  last_updated_by: Michael Kedar
+  last_updated_on: 2023-08-17 04:40:47.000000000 Z
+- name: PyYAML
+  website_url: http://pyyaml.org/wiki/PyYAML
+  open_source: false
+  hosted_saas: false
+  image_url: https://img.stackshare.io/service/3730/no-img-open-source.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile
+  detection_source: Pipfile
+  last_updated_by: Oliver Chang
+  last_updated_on: 2021-11-29 03:29:43.000000000 Z
+- name: Shell
+  description: A shell is a text-based terminal, used for manipulating programs and
+    files. Shell scripts typically manage program execution.
+  website_url: https://en.wikipedia.org/wiki/Shell_script
+  open_source: false
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/4631/default_c2062d40130562bdc836c13dbca02d318205a962.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-
+  detection_source: Repo Metadata
+- name: Ubuntu
+  description: The leading OS for PC, tablet, phone and cloud
+  website_url: http://www.ubuntu.com/
+  open_source: false
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Operating Systems
+  image_url: https://img.stackshare.io/service/3511/cof_orange_hex.jpg
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/deployment/Dockerfile
+  detection_source: docker/deployment/Dockerfile
+  last_updated_by: Oliver Chang
+  last_updated_on: 2022-09-05 05:38:40.000000000 Z
+- name: Werkzeug
+  website_url: https://palletsprojects.com/p/werkzeug/
+  open_source: false
+  hosted_saas: false
+  image_url: https://img.stackshare.io/service/11076/iwoLyNPI_normal.jpg
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/Pipfile
+  detection_source: gcp/appengine/Pipfile
+  last_updated_by: dependabot[bot]
+  last_updated_on: 2023-10-26 02:04:32.000000000 Z
+- name: crypto
+  description: Go supplementary cryptography libraries
+  package_url: https://pkg.go.dev/golang.org/x/crypto
+  version: 0.0.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: dependabot[bot]
+  last_updated_on: 2023-10-18 02:31:23.000000000 Z
+  vulnerabilities:
+  - name: Improper Verification of Cryptographic Signature in golang.org/x/crypto
+    cve_id: CVE-2020-9283
+    cve_url: https://github.com/advisories/GHSA-ffhg-7mh4-33c4
+    detected_date: Aug 22
+    severity: moderate
+    first_patched: 0.0.0-20200220183623-bac4c82f6975
+- name: yaml.v2
+  description: YAML support for the Go language
+  package_url: https://pkg.go.dev/gopkg.in/yaml.v2
+  version: 2.2.2
+  license: LGPL-3.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: vulnfeeds/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2022-11-28 01:34:05.000000000 Z
+  vulnerabilities:
+  - name: Excessive Platform Resource Consumption within a Loop in Kubernetes
+    cve_id: CVE-2019-11254
+    cve_url: https://github.com/advisories/GHSA-wxc4-f4m6-wwqv
+    detected_date: Jan 28
+    severity: moderate
+    first_patched: 2.2.8
+- name: appengine
+  description: Go App Engine packages
+  package_url: https://pkg.go.dev/google.golang.org/appengine
+  version: 1.1.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Rex P
+  last_updated_on: 2023-09-26 06:17:27.000000000 Z
+- name: datastore
+  description: Google Cloud Client Libraries for Go
+  package_url: https://pkg.go.dev/cloud.google.com/go/datastore
+  version: 1.14.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-09-11 05:38:31.000000000 Z
+- name: errors
+  description: Simple error handling primitives
+  package_url: https://pkg.go.dev/github.com/pkg/errors
+  version: 0.9.1
+  license: BSD-2-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: vulnfeeds/go.mod
+  last_updated_by: Andrew Pollock
+  last_updated_on: 2023-01-10 05:09:08.000000000 Z
+- name: exp
+  description: Experimental and deprecated packages
+  package_url: https://pkg.go.dev/golang.org/x/exp
+  version: 0.0.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: vulnfeeds/go.mod
+  last_updated_by: Oliver Chang
+  last_updated_on: 2021-04-08 23:20:32.000000000 Z
+- name: filepath-securejoin
+  description: Proposed filepath.SecureJoin implementation
+  package_url: https://pkg.go.dev/github.com/cyphar/filepath-securejoin
+  version: 0.2.4
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-09-18 00:09:13.000000000 Z
+- name: glog
+  description: Leveled execution logs for Go
+  package_url: https://pkg.go.dev/github.com/golang/glog
+  version: 0.0.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-08-21 01:28:27.000000000 Z
+- name: go
+  description: Google Cloud Client Libraries for Go
+  package_url: https://pkg.go.dev/cloud.google.com/go
+  version: 0.26.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Martin Sablotny
+  last_updated_on: 2022-08-15 00:43:30.000000000 Z
+- name: go-context
+  description: Context.Context extentions
+  package_url: https://pkg.go.dev/github.com/jbenet/go-context
+  version: 0.0.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Rex P
+  last_updated_on: 2023-09-26 06:17:27.000000000 Z
+- name: go-diff
+  description: Diff, match and patch text in Go
+  package_url: https://pkg.go.dev/github.com/sergi/go-diff
+  version: 1.3.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Rex P
+  last_updated_on: 2023-09-26 06:17:27.000000000 Z
+- name: go-winio
+  description: Win32 IO-related utilities for Go
+  package_url: https://pkg.go.dev/github.com/Microsoft/go-winio
+  version: 0.5.2
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-09-11 05:38:31.000000000 Z
+- name: go/compute/metadata
+  description: Google Cloud Client Libraries for Go
+  package_url: https://pkg.go.dev/cloud.google.com/go/compute/metadata
+  version: 0.2.3
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-09-11 05:38:31.000000000 Z
+- name: go/iam
+  description: Google Cloud Client Libraries for Go
+  package_url: https://pkg.go.dev/cloud.google.com/go/iam
+  version: 1.1.2
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Rex P
+  last_updated_on: 2023-09-26 06:17:27.000000000 Z
+- name: go/logging
+  description: Google Cloud Client Libraries for Go
+  package_url: https://pkg.go.dev/cloud.google.com/go/logging
+  version: 1.8.1
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/vulnfeeds/go.sum
+  detection_source: vulnfeeds/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-12-04 00:37:34.000000000 Z
+- name: go/storage
+  description: Google Cloud Client Libraries for Go
+  package_url: https://pkg.go.dev/cloud.google.com/go/storage
+  version: 1.33.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-09-11 05:38:31.000000000 Z
+- name: gods
+  description: GoDS
+  package_url: https://pkg.go.dev/github.com/emirpasic/gods
+  version: 1.18.1
+  license: Other
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2022-12-05 03:50:58.000000000 Z
+- name: google/uuid
+  description: 'Go package for UUIDs based on RFC 4122 and DCE 1.1: Authentication
+    and Security Services'
+  package_url: https://pkg.go.dev/github.com/google/uuid
+  version: 1.1.2
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: dependabot[bot]
+  last_updated_on: 2023-10-26 02:39:35.000000000 Z
+- name: groupcache
+  description: Groupcache is a caching and cache-filling library
+  package_url: https://pkg.go.dev/github.com/golang/groupcache
+  version: 0.0.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-05-30 03:51:05.000000000 Z
+- name: kr/text
+  description: Miscellaneous functions for formatting text
+  package_url: https://pkg.go.dev/github.com/kr/text
+  version: 0.1.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docs/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-11-08 00:18:03.000000000 Z
+- name: net
+  description: Go supplementary network libraries
+  package_url: https://pkg.go.dev/golang.org/x/net
+  version: 0.0.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Martin Sablotny
+  last_updated_on: 2022-08-15 00:43:30.000000000 Z
+- name: oauth2
+  description: Go OAuth2
+  package_url: https://pkg.go.dev/golang.org/x/oauth2
+  version: 0.0.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-09-18 00:09:13.000000000 Z
+- name: proto
+  description: Go support for Google's protocol buffers
+  package_url: https://pkg.go.dev/github.com/golang/protobuf/proto
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.mod
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Rex P
+  last_updated_on: 2023-09-26 06:17:27.000000000 Z
+- name: pubsub
+  description: Google Cloud Client Libraries for Go
+  package_url: https://pkg.go.dev/cloud.google.com/go/pubsub
+  version: 1.33.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-09-11 05:38:31.000000000 Z
+- name: ssh-agent
+  description: Create a new SSH agent on any type of OS
+  package_url: https://pkg.go.dev/github.com/xanzy/ssh-agent
+  version: 0.3.3
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-01-05 01:19:28.000000000 Z
+- name: sys
+  description: Go packages for low-level interaction with the operating system
+  package_url: https://pkg.go.dev/golang.org/x/sys
+  version: 0.0.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Martin Sablotny
+  last_updated_on: 2022-08-15 00:43:30.000000000 Z
+- name: text
+  description: Go text processing support
+  package_url: https://pkg.go.dev/golang.org/x/text
+  version: 0.3.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-09-18 00:09:13.000000000 Z
+- name: tools
+  description: Go Tools
+  package_url: https://pkg.go.dev/golang.org/x/tools
+  version: 0.0.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-09-18 00:09:13.000000000 Z
+- name: warnings.v0
+  description: Package warnings implements error handling with non-fatal errors
+  package_url: https://pkg.go.dev/gopkg.in/warnings.v0
+  version: 0.1.2
+  open_source: false
+  hosted_saas: false
+  category: Libraries
+  sub_category: Go Modules Packages
+  image_url: https://img.stackshare.io/package/go-packages/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/indexer/go.sum
+  detection_source: docker/indexer/go.mod
+  last_updated_by: Martin Sablotny
+  last_updated_on: 2022-08-15 00:43:30.000000000 Z
+- name: cryptography
+  description: Cryptography is a package which provides cryptographic recipes and
+    primitives to Python developers
+  package_url: https://pypi.org/project/cryptography
+  version: 41.0.7
+  license: BSD-3-Clause,Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19850/default_db2ab2702f70e20c272f6ce65251108fb2b8f1ea.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/functions/pypi/Pipfile.lock
+  detection_source: gcp/functions/pypi/Pipfile
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-12-04 00:36:14.000000000 Z
+  vulnerabilities:
+  - name: cryptography NULL pointer dereference with pkcs12.serialize_key_and_certificates
+      when called with a non-matching certificate and private key and an hmac_hash
+      override
+    cve_id: CVE-2024-26130
+    cve_url: https://github.com/advisories/GHSA-6vqw-3v5j-54x4
+    detected_date: Feb 22
+    severity: high
+    first_patched: 42.0.4
+  - name: Python Cryptography package vulnerable to Bleichenbacher timing oracle attack
+    cve_id: CVE-2023-50782
+    cve_url: https://github.com/advisories/GHSA-3ww4-gg4f-jr7f
+    detected_date: Feb 6
+    severity: high
+    first_patched: 42.0.0
+  - name: Null pointer dereference in PKCS12 parsing
+    cve_id: CVE-2024-0727
+    cve_url: https://github.com/advisories/GHSA-9v9h-cgj8-h64p
+    detected_date: Feb 17
+    severity: moderate
+    first_patched: 42.0.2
+- name: requests
+  description: Python HTTP for Humans
+  package_url: https://pypi.org/project/requests
+  version: 2.31.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19826/default_d7c684bf2673f008a9f02ac93901229297a22d7e.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: gcp/api/Pipfile
+  last_updated_by: Michael Kedar
+  last_updated_on: 2023-06-01 03:18:39.000000000 Z
+  vulnerabilities:
+  - name: Requests `Session` object does not verify requests after making first request
+      with verify=False
+    cve_id: CVE-2024-35195
+    cve_url: https://github.com/advisories/GHSA-9wx4-h78v-vm56
+    detected_date: May 21
+    severity: moderate
+    first_patched: 2.32.0
+- name: Flask-Caching
+  description: Adds caching support to your Flask application
+  package_url: https://pypi.org/project/Flask-Caching
+  version: 2.1.0
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20332/default_1a060bd30ca72545354e1c3d92e9b224f6c0e5e2.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/Pipfile
+  detection_source: gcp/appengine/Pipfile
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-10-25 05:42:39.000000000 Z
+- name: Flask-Compress
+  description: Compress responses in your Flask app with gzip
+  package_url: https://pypi.org/project/Flask-Compress
+  version: '1.13'
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/Pipfile
+  detection_source: gcp/appengine/Pipfile
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-10-25 05:42:39.000000000 Z
+- name: Jinja2
+  description: A very fast and expressive template engine
+  package_url: https://pypi.org/project/Jinja2
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19836/default_85689b353a3a9409328e253ea28d859d29151e0c.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/Pipfile
+  detection_source: gcp/appengine/Pipfile
+  last_updated_by: Rex P
+  last_updated_on: 2022-08-22 00:33:44.000000000 Z
+- name: MarkupSafe
+  description: Safely add untrusted strings to HTML/XML markup
+  package_url: https://pypi.org/project/MarkupSafe
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19945/default_0b0a94e1bdf3e64deeccb23892ca2335bdc30e4f.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/Pipfile
+  detection_source: gcp/appengine/Pipfile
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-06-26 00:46:59.000000000 Z
+- name: PyYAML
+  description: YAML parser and emitter for Python
+  package_url: https://pypi.org/project/PyYAML
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19829/default_74a61b43bdb9fc0cba2978316b9976f43545029b.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/worker/Pipfile
+  detection_source: docker/worker/Pipfile
+  last_updated_by: Oliver Chang
+  last_updated_on: 2021-01-08 01:57:50.000000000 Z
+- name: attrs
+  description: Classes Without Boilerplate
+  package_url: https://pypi.org/project/attrs
+  version: 23.1.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19857/default_4a8a8fdc10130068bf295812b98e9b72fb42fe70.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: Pipfile
+  last_updated_by: Rex P
+  last_updated_on: 2022-07-01 00:54:33.000000000 Z
+- name: google-auth
+  description: Google Authentication Library
+  package_url: https://pypi.org/project/google-auth
+  version: 2.23.4
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19955/default_1965f66bb5a4d2eb7b31193d7be6d8a9041d02b9.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: gcp/appengine/Pipfile
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-12-05 00:40:07.000000000 Z
+- name: google-cloud-logging
+  description: Stackdriver Logging API client library
+  package_url: https://pypi.org/project/google-cloud-logging
+  version: 3.8.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20551/default_2bd6b1bbea25e0422bf129a726728cd8e73433f2.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: Pipfile
+  last_updated_by: Andrew Pollock
+  last_updated_on: 2023-10-31 18:55:24.000000000 Z
+- name: google-cloud-pubsub
+  description: Google Cloud Pub/Sub API client library
+  package_url: https://pypi.org/project/google-cloud-pubsub
+  version: 2.18.4
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20317/default_5f4e928dbcb1c4db4050881fc2e0229785fc931c.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docker/worker/Pipfile.lock
+  detection_source: docker/worker/Pipfile
+  last_updated_by: Oliver Chang
+  last_updated_on: 2021-03-29 03:21:14.000000000 Z
+- name: google-cloud-storage
+  description: Google Cloud Storage API client library
+  package_url: https://pypi.org/project/google-cloud-storage
+  version: 2.13.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19996/default_1ae269f6aa26d7008f18ed620309f6ae89bbfa12.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: Pipfile
+  last_updated_by: Andrew Pollock
+  last_updated_on: 2023-10-31 18:55:24.000000000 Z
+- name: grpcio
+  description: HTTP/2-based RPC framework
+  package_url: https://pypi.org/project/grpcio
+  version: 1.59.2
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19903/default_1d0eb6da6bdd342bb15f73d8f1721516ebacd1dc.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: Pipfile
+  last_updated_by: Oliver Chang
+  last_updated_on: 2022-12-12 03:39:35.000000000 Z
+- name: grpcio-health-checking
+  description: Standard Health Checking Service for gRPC
+  package_url: https://pypi.org/project/grpcio-health-checking
+  version: 1.59.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/api/Pipfile.lock
+  detection_source: gcp/api/Pipfile
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-10-03 04:42:43.000000000 Z
+- name: grpcio-reflection
+  description: Standard Protobuf Reflection Service for gRPC
+  package_url: https://pypi.org/project/grpcio-reflection
+  version: 1.59.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/pypi/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/api/Pipfile.lock
+  detection_source: gcp/api/Pipfile
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-10-03 04:42:43.000000000 Z
+- name: grpcio-tools
+  description: Protobuf code generator for gRPC
+  package_url: https://pypi.org/project/grpcio-tools
+  version: 1.59.2
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20003/default_87268cab0d3a3b3acf3aa0576d4b114b8e4c2521.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: Pipfile
+  last_updated_by: Oliver Chang
+  last_updated_on: 2022-12-12 03:39:35.000000000 Z
+- name: jsonschema
+  description: An implementation of JSON Schema validation for Python
+  package_url: https://pypi.org/project/jsonschema
+  version: 4.19.2
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19854/default_3fbfa1d88b4408e903227ac391490e8efb8dea58.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: Pipfile
+  last_updated_by: Rex P
+  last_updated_on: 2022-11-15 04:58:41.000000000 Z
+- name: markdown2
+  description: A fast and complete Python implementation of Markdown
+  package_url: https://pypi.org/project/markdown2
+  version: 2.4.11
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20473/default_800512522a1f8bb3ddeb015413c72f7409eb0719.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/Pipfile.lock
+  detection_source: gcp/appengine/Pipfile
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-12-05 00:40:07.000000000 Z
+- name: packaging
+  description: Core utilities for Python packages
+  package_url: https://pypi.org/project/packaging
+  version: '21.3'
+  license: BSD-3-Clause,Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19894/default_f716e4bc541a9eb6e3f5b7a20d7c35355075b0b4.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: Pipfile
+  last_updated_by: Oliver Chang
+  last_updated_on: 2023-05-04 03:40:02.000000000 Z
+- name: pandas
+  description: Powerful data structures for data analysis
+  package_url: https://pypi.org/project/pandas
+  version: 2.1.3
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19837/default_85689b353a3a9409328e253ea28d859d29151e0c.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/vulnfeeds/tools/debian/debian_converter/Pipfile.lock
+  detection_source: vulnfeeds/tools/debian/debian_converter/Pipfile
+  last_updated_by: Michael Kedar
+  last_updated_on: 2023-12-04 02:46:25.000000000 Z
+- name: pipenv
+  description: Python Development Workflow for Humans
+  package_url: https://pypi.org/project/pipenv
+  version: 2023.10.24
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20516/default_35c96ceb69f6db523362c5b30e575b2d4ddfcab3.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: Pipfile
+  last_updated_by: Oliver Chang
+  last_updated_on: 2022-09-06 05:13:16.000000000 Z
+- name: pygit2
+  description: Python bindings for libgit2
+  package_url: https://pypi.org/project/pygit2
+  version: 1.13.2
+  license: BSD-3-Clause-Attribution
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20493/default_7e42545a0162c6dd67f6adc715d6eabd6d2d2736.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: Pipfile
+  last_updated_by: Oliver Chang
+  last_updated_on: 2022-07-18 01:50:59.000000000 Z
+- name: python-dateutil
+  description: Extensions to the standard Python datetime module
+  package_url: https://pypi.org/project/python-dateutil
+  version: 2.8.2
+  license: NRL
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19833/default_58dbe7b4d7ec447b62773209af0f9a31bbabf5bd.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/vulnfeeds/tools/debian/debian_converter/Pipfile.lock
+  detection_source: vulnfeeds/tools/debian/debian_converter/Pipfile
+  last_updated_by: Rex P
+  last_updated_on: 2023-10-06 05:28:46.000000000 Z
+- name: semver
+  description: Python helper for Semantic Versioning
+  package_url: https://pypi.org/project/semver
+  version: 3.0.2
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/19960/default_61e35171bd9c0e5c5b88b2e4221ca242576ad8c0.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: Pipfile
+  last_updated_by: Michael Kedar
+  last_updated_on: 2023-04-21 01:46:12.000000000 Z
+- name: whitenoise
+  description: Radically simplified static file serving for WSGI applications
+  package_url: https://pypi.org/project/whitenoise
+  version: 6.6.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20302/default_e6bfb9eb79752f0f359e80676966e216a56792ab.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/Pipfile.lock
+  detection_source: gcp/appengine/Pipfile
+  last_updated_by: Rex P
+  last_updated_on: 2023-09-19 01:09:41.000000000 Z
+- name: yapf
+  description: A formatter for Python code
+  package_url: https://pypi.org/project/yapf
+  version: 0.40.2
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: PyPI Packages
+  image_url: https://img.stackshare.io/package/20399/default_27c957eac1674813a0a457a78f430be9e3c184a7.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/Pipfile.lock
+  detection_source: Pipfile
+  last_updated_by: Oliver Chang
+  last_updated_on: 2022-07-13 00:27:09.000000000 Z
+- name: copy-webpack-plugin
+  description: Copy files &amp;&amp; directories with webpack
+  package_url: https://www.npmjs.com/copy-webpack-plugin
+  version: 10.2.4
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/15941/default_b45165a5d30e541ab11711a34a78209b3e8ed7fd.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/frontend3/package-lock.json
+  detection_source: gcp/appengine/frontend3/package.json
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-12-05 00:40:38.000000000 Z
+- name: html-webpack-plugin
+  description: Simplifies creation of HTML files to serve your webpack bundles
+  package_url: https://www.npmjs.com/html-webpack-plugin
+  version: 5.5.3
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/15841/default_5e5e8ac63beda29f31f1844df64d4b8247570a66.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/frontend3/package-lock.json
+  detection_source: gcp/appengine/frontend3/package.json
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-12-05 00:40:38.000000000 Z
+- name: mini-css-extract-plugin
+  description: Extracts CSS into separate files
+  package_url: https://www.npmjs.com/mini-css-extract-plugin
+  version: 2.7.6
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/15992/default_8b5680d4e916298d08363c291a0d6e34c07ceb15.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/frontend3/package-lock.json
+  detection_source: gcp/appengine/frontend3/package.json
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-06-15 00:22:46.000000000 Z
+- name: raw-loader
+  description: A loader for webpack that allows importing files as a String
+  package_url: https://www.npmjs.com/raw-loader
+  version: 4.0.2
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/16030/default_7a465bc85b23fd837cbc038fd1d504632c41a884.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/frontend3/package-lock.json
+  detection_source: gcp/appengine/frontend3/package.json
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-05-31 06:46:51.000000000 Z
+- name: sass-loader
+  description: Sass loader for webpack
+  package_url: https://www.npmjs.com/sass-loader
+  version: 12.6.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/15842/default_b71c906aeda030a5e2f1fe40bf12a93be52404ab.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/frontend3/package-lock.json
+  detection_source: gcp/appengine/frontend3/package.json
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-12-05 00:40:38.000000000 Z
+- name: style-loader
+  description: Style loader module for webpack
+  package_url: https://www.npmjs.com/style-loader
+  version: 3.3.3
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/15822/default_004658cda9b38934f2871435e9dc15608c86e8be.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/frontend3/package-lock.json
+  detection_source: gcp/appengine/frontend3/package.json
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-05-31 06:46:51.000000000 Z
+- name: webpack-bundle-analyzer
+  description: Webpack plugin and CLI utility that represents bundle content as convenient
+    interactive zoomable treemap
+  package_url: https://www.npmjs.com/webpack-bundle-analyzer
+  version: 4.10.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/15991/default_cbd6c289400672b291755183817e9dd6abe1a612.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/frontend3/package-lock.json
+  detection_source: gcp/appengine/frontend3/package.json
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-12-05 00:40:38.000000000 Z
+- name: webpack-cli
+  description: CLI for webpack &amp; friends
+  package_url: https://www.npmjs.com/webpack-cli
+  version: 4.10.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/15826/default_14fd11531839d935f920b6d55bd6f3528c890ad7.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/frontend3/package-lock.json
+  detection_source: gcp/appengine/frontend3/package.json
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-12-05 00:40:38.000000000 Z
+- name: webpack-dev-server
+  description: Serves a webpack app. Updates the browser on changes
+  package_url: https://www.npmjs.com/webpack-dev-server
+  version: 4.15.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/15821/default_64690bc3e49bcee57094e51a7a26c620c48dbd82.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/gcp/appengine/frontend3/package-lock.json
+  detection_source: gcp/appengine/frontend3/package.json
+  last_updated_by: Mend Renovate
+  last_updated_on: 2023-12-05 00:40:38.000000000 Z
+- name: github-pages
+  description: Bootstrap the GitHub Pages Jekyll environment locally
+  package_url: https://rubygems.org/github-pages
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: RubyGems Packages
+  image_url: https://img.stackshare.io/package/rubygems/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docs/Gemfile
+  detection_source: docs/Gemfile
+  last_updated_by: Hayley Denbraver
+  last_updated_on: 2023-04-12 01:39:48.000000000 Z
+- name: http_parser.rb
+  description: Ruby bindings to http://github.com/ry/http-parser and http://github.com/a2800276/http-parser.java
+  package_url: https://rubygems.org/http_parser.rb
+  version: 0.8.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: RubyGems Packages
+  image_url: https://img.stackshare.io/package/19361/default_586c7ce6af1eca79bd84e28b9ad0423907b71664.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docs/Gemfile.lock
+  detection_source: docs/Gemfile
+  last_updated_by: Hayley Denbraver
+  last_updated_on: 2023-04-12 01:39:48.000000000 Z
+- name: jekyll-feed
+  description: A Jekyll plugin to generate an Atom feed of your Jekyll posts
+  package_url: https://rubygems.org/jekyll-feed
+  version: 0.15.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: RubyGems Packages
+  image_url: https://img.stackshare.io/package/19149/default_b0a1033a29112f6f50b1dd3157e5fbf94dd2778a.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docs/Gemfile.lock
+  detection_source: docs/Gemfile
+  last_updated_by: Hayley Denbraver
+  last_updated_on: 2023-04-12 01:39:48.000000000 Z
+- name: tzinfo
+  description: TZInfo provides access to time zone data and allows times to be converted
+    using time zone rules
+  package_url: https://rubygems.org/tzinfo
+  version: 2.0.6
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: RubyGems Packages
+  image_url: https://img.stackshare.io/package/18981/default_eb163f66039a75cd168fad8a88ccdb68b82bccff.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docs/Gemfile.lock
+  detection_source: docs/Gemfile
+  last_updated_by: Hayley Denbraver
+  last_updated_on: 2023-04-12 01:39:48.000000000 Z
+- name: tzinfo-data
+  description: TZInfo::Data contains data from the IANA Time Zone database packaged
+    as Ruby modules for use with TZInfo
+  package_url: https://rubygems.org/tzinfo-data
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: RubyGems Packages
+  image_url: https://img.stackshare.io/package/19516/default_07037590725b871de29c1d2ebb4610950e953355.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docs/Gemfile
+  detection_source: docs/Gemfile
+  last_updated_by: Hayley Denbraver
+  last_updated_on: 2023-04-12 01:39:48.000000000 Z
+- name: wdm
+  description: Windows Directory Monitor
+  package_url: https://rubygems.org/wdm
+  version: 0.1.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: RubyGems Packages
+  image_url: https://img.stackshare.io/package/rubygems/image.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docs/Gemfile
+  detection_source: docs/Gemfile
+  last_updated_by: Hayley Denbraver
+  last_updated_on: 2023-04-12 01:39:48.000000000 Z
+- name: webrick
+  description: WEBrick is an HTTP server toolkit that can be configured as an HTTPS
+    server
+  package_url: https://rubygems.org/webrick
+  version: 1.8.1
+  license: BSD-2-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: RubyGems Packages
+  image_url: https://img.stackshare.io/package/19444/default_e747a715ce0379afdb68c78657d70e4a512bf5f4.png
+  detection_source_url: https://github.com/Huntemall/osv.dev--BigDev-/blob/dev/docs/Gemfile.lock
+  detection_source: docs/Gemfile
+  last_updated_by: Hayley Denbraver
+  last_updated_on: 2023-04-12 01:39:48.000000000 Z
