@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash -ex
 # Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,5 @@
 
 cd ../worker
 
-export PIPENV_IGNORE_VIRTUALENVS=1
-pipenv sync
-pipenv run python ../alias/alias_computation_test.py
+poetry install
+poetry run python ../alias/alias_computation_test.py

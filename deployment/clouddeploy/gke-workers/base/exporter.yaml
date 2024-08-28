@@ -3,12 +3,21 @@ kind: CronJob
 metadata:
   name: exporter
 spec:
-  schedule: "0 */1 * * *"
+  schedule: "*/30 * * * *"
   concurrencyPolicy: Forbid
+  # If the previous job overruns by more than a minute,
+  # Don't try to immediately queue up the next job
+  startingDeadlineSeconds: 60
   jobTemplate:
     spec:
       template:
         spec:
+          tolerations:
+          - key: workloadType
+            operator: Equal
+            value: highend
+          nodeSelector:
+            cloud.google.com/gke-nodepool: highend
           containers:
           - name: exporter
             image: exporter
@@ -18,13 +27,13 @@ spec:
                 name: "ssd"
             resources:
               requests:
-                cpu: 1
-                memory: "3G"
+                cpu: "6"
+                memory: "48G"
               limits:
-                cpu: 1
-                memory: "4G"
+                cpu: "6"
+                memory: "128G"
           restartPolicy: OnFailure
           volumes:
             - name: "ssd"
-              hostPath:
-                path: "/mnt/disks/ssd0"
+              emptyDir:
+                sizeLimit: 60Gi

@@ -16,53 +16,73 @@ supports an arbitrary number of vulnerability IDs on the command line.
 
 from google.cloud import datastore
 from google.cloud import storage
+from google.cloud.exceptions import NotFound
+from google.cloud.storage import retry
 from google.cloud.datastore.query import PropertyFilter
 
 import argparse
 import os
 import functools
 
-MAX_BATCH_SIZE = 500
+MAX_QUERY_SIZE = 30
 
 
 class UnexpectedSituation(Exception):
   pass
 
 
-def objname_for_bug(client: datastore.Client,
-                    bug: datastore.entity.Entity) -> dict:
+def objname_for_bug(client: datastore.Client, bug: datastore.entity.Entity,
+                    forced_bucket_name: str) -> dict:
   """Returns the GCS object details for a given Bug.
 
   Args:
       client: an initialized Cloud Datastore client.
       bug: a Bug Cloud Datastore entity.
+      forced_bucket_name: bucket name (with optional colon-separated path) to
+      forcibly use.
 
   Returns:
     A dict with keys for the GCS uri, the bucket name and path within the
     bucket.
   """
+  source_object_path = bug["source_id"].split(":")[1]
+
+  if forced_bucket_name:
+    (bucket, _, bucketpath) = forced_bucket_name.partition(":")
+    # The assumption is that when passed a different bucket path, only the
+    # current object's base filename is relevant.
+    return {
+        "uri":
+            "gs://" + os.path.join(bucket, bucketpath,
+                                   os.path.basename(source_object_path)),
+        "bucket":
+            bucket,
+        "path":
+            os.path.join(bucketpath, os.path.basename(source_object_path))
+    }
+
   bucket = bucket_for_source(client, bug["source"])
   return {
-      "uri": "gs://" + os.path.join(bucket, bug["source_id"].split(":")[1]),
+      "uri": "gs://" + os.path.join(bucket, source_object_path),
       "bucket": bucket,
-      "path": bug["source_id"].split(":")[1]
+      "path": source_object_path
   }
 
 
 def url_for_project(project: str) -> str:
   """Returns the base URL for referencing a vulnerability in the project.
-  
+
   Args:
     project: a string representing the project ID.
-    
+
   Returns:
     A string URL base for appending vulnerability IDs to.
-    
+
   Raises:
     UnexpectedSituation if called with an unsupported project ID.
   """
   if project == "oss-vdb-test":
-    return "https://oss-vdb-test.wl.r.appspot.com/"
+    return "https://test.osv.dev/"
   if project == "oss-vdb":
     return "https://osv.dev/"
   raise UnexpectedSituation(f"Unexpected project {project}")
@@ -112,7 +132,7 @@ def reset_object_creation(bucket_name: str,
   bucket = gcs_client.bucket(bucket_name)
   blob = bucket.blob(blob_name)
   blob.download_to_filename(local_tmp_file)
-  blob.upload_from_filename(local_tmp_file)
+  blob.upload_from_filename(local_tmp_file, retry=retry.DEFAULT_RETRY)
   os.unlink(local_tmp_file)
 
 
@@ -120,7 +140,10 @@ def main() -> None:
   parser = argparse.ArgumentParser(
       description="Trigger the reimport of individual GCS-sourced records")
   parser.add_argument(
-      "bugs", action="append", nargs="+", help="The bug IDs to operate on")
+      "bugs",
+      action="append",
+      nargs="+",
+      help=f"The bug IDs to operate on ({MAX_QUERY_SIZE} at most)")
   parser.add_argument(
       "--dry-run",
       action=argparse.BooleanOptionalAction,
@@ -145,7 +168,18 @@ def main() -> None:
       dest="tmpdir",
       default="/tmp",
       help="Local directory to copy to from GCS")
+  parser.add_argument(
+      "--bucket",
+      action="store",
+      dest="bucket",
+      default=None,
+      help=("Override the bucket name (and with a colon + path, the path) "
+            "for the object in GCS (e.g. `cve-osv-conversion:osv-output`)"))
   args = parser.parse_args()
+
+  if len(args.bugs[0]) > MAX_QUERY_SIZE:
+    parser.error(f"Only {MAX_QUERY_SIZE} bugs can be supplied. "
+                 f"Try running with xargs -n {MAX_QUERY_SIZE}")
 
   ds_client = datastore.Client(project=args.project)
   url_base = url_for_project(args.project)
@@ -159,29 +193,40 @@ def main() -> None:
   result_to_fix = [r for r in result if r['source_of_truth'] == 2]
   print(f"There are {len(result_to_fix)} bugs to operate on...")
 
-  # Chunk the results to modify in acceptibly sized batches for the API.
-  for batch in range(0, len(result_to_fix), MAX_BATCH_SIZE):
-    try:
-      with ds_client.transaction() as xact:
-        for bug in result_to_fix[batch:batch + MAX_BATCH_SIZE]:
-          bug_in_gcs = objname_for_bug(ds_client, bug)
+  try:
+    with ds_client.transaction() as xact:
+      for bug in result_to_fix:
+        try:
+          bug_in_gcs = objname_for_bug(
+              ds_client, bug, forced_bucket_name=args.bucket)
+        except UnexpectedSituation as e:
           if args.verbose:
-            print(f"Resetting creation time for {bug_in_gcs['uri']}")
-          if not args.dryrun:
+            print(f"Skipping {bug['db_id']}, got {e}\n")
+          continue
+        if args.verbose:
+          print(f"Resetting creation time for {bug_in_gcs['uri']}")
+        if not args.dryrun:
+          try:
             reset_object_creation(bug_in_gcs["bucket"], bug_in_gcs["path"],
                                   args.tmpdir)
-          bug["import_last_modified"] = None
-          if args.verbose:
-            print(f"Resetting import_last_modified for {bug['db_id']}")
-          print(f"Review at {url_base}{bug['db_id']} when reimport completes.")
-          xact.put(bug)
-        if args.dryrun:
-          raise Exception("Dry run mode. Preventing transaction from commiting")  # pylint: disable=broad-exception-raised
-    except Exception as e:
-      # Don't have the first batch's transaction-aborting exception stop
-      # subsequent batches from being attempted.
-      if args.dryrun and e.args[0].startswith("Dry run mode"):
-        pass
+          except NotFound as e:
+            if args.verbose:
+              print(f"Skipping, got {e}\n")
+            continue
+        bug["import_last_modified"] = None
+        if args.verbose:
+          print(f"Resetting import_last_modified for {bug['db_id']}")
+        print(f"Review at {url_base}{bug['db_id']} when reimport completes.")
+        xact.put(bug)
+      if args.dryrun:
+        raise Exception("Dry run mode. Preventing transaction from commiting")  # pylint: disable=broad-exception-raised
+  except Exception as e:
+    # Don't have the first batch's transaction-aborting exception stop
+    # subsequent batches from being attempted.
+    if args.dryrun and e.args[0].startswith("Dry run mode"):
+      pass
+    else:
+      raise
 
 
 if __name__ == "__main__":

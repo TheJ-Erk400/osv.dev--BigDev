@@ -13,26 +13,88 @@
 # limitations under the License.
 
 steps:
+# noop to pull the ci image once before the tests try to run concurrently
+- name: 'gcr.io/oss-vdb/ci'
+  args: ['echo']
+
 - name: 'gcr.io/cloud-builders/git'
-  dir: docker/worker
+  id: 'init'
   args: ['submodule', 'update', '--init']
+
 - name: 'gcr.io/oss-vdb/ci'
+  id: 'lib-tests'
   args: ['bash', '-ex', 'run_tests.sh']
+  env:
+    # Each concurrent test that uses the datastore emulator must have a unique port number
+    # lib-tests is the first test that starts the emulator. The first emulator call creates the
+    # test project config. Every other datastore must wait till this finishes, otherwise
+    # we risk multiple attempts at creating the config directory, causing failure.
+    - DATASTORE_EMULATOR_PORT=8002
+  waitFor: ['init']
+
+# Sourcerepo-sync-tests and lib-tests use the same env so have a race condition. 
 - name: 'gcr.io/oss-vdb/ci'
+  id: 'sourcerepo-sync-tests'
+  dir: 'tools/sourcerepo-sync'
+  args: ['bash', '-ex', 'run_tests.sh']
+  waitFor: ['init', 'lib-tests']
+
+- name: 'gcr.io/oss-vdb/ci'
+  id: 'worker-tests'
   dir: docker/worker
   args: ['bash', '-ex', 'run_tests.sh']
+  env:
+    # Each concurrent test that uses the datastore emulator must have a unique port number
+    # Wait for lib-tests to make sure the project directory is created
+    - DATASTORE_EMULATOR_PORT=8003
+  waitFor: ['init', 'lib-tests']
+
 - name: 'gcr.io/oss-vdb/ci'
+  id: 'importer-tests'
   dir: docker/importer
   args: ['bash', '-ex', 'run_tests.sh']
+  env:
+    - CLOUD_BUILD=1
+    # same as worker
+    - DATASTORE_EMULATOR_PORT=8003
+  # importer uses same poetry as worker, 'poetry install' may break if run concurrently
+  waitFor: ['init', 'worker-tests']
+
 - name: 'gcr.io/oss-vdb/ci'
+  id: 'alias-tests'
+  dir: docker/alias
+  args: ['bash', '-ex', 'run_tests.sh']
+  env:
+    # same as worker/importer
+    - DATASTORE_EMULATOR_PORT=8003
+  # alias uses same poetry as worker, 'poetry install' may break if run concurrently
+  waitFor: ['init', 'importer-tests']
+
+- name: 'gcr.io/oss-vdb/ci'
+  id: 'appengine-tests'
+  dir: gcp/appengine
+  args: ['bash', '-ex', 'run_tests.sh']
+  env:
+    # Each concurrent test that uses the datastore emulator must have a unique port number
+    # Wait for lib-tests to make sure the project directory is created
+    - DATASTORE_EMULATOR_PORT=8004
+  waitFor: ['init', 'lib-tests']
+
+- name: 'gcr.io/oss-vdb/ci'
+  id: 'vulnfeed-tests'
   dir: vulnfeeds
   args: ['bash', '-ex', 'run_tests.sh']
+  waitFor: ['init']
+
 - name: 'gcr.io/oss-vdb/ci'
+  id: 'api-tests'
   dir: gcp/api
   #TODO: Update test scripts to support not supplying a credential.
   args: ['bash', '-ex', 'run_tests.sh', '/workspace/dummy.json']
   env:
     - CLOUDBUILD=1
+  waitFor: ['init']
+
 timeout: 7200s
 options:
   machineType: E2_HIGHCPU_8

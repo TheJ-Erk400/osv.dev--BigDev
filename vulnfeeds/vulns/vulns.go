@@ -18,7 +18,6 @@ import (
 	"cmp"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/url"
 	"os"
@@ -60,9 +59,10 @@ type Severity struct {
 }
 
 type Affected struct {
-	Package  *AffectedPackage `json:"package,omitempty"`
-	Ranges   []AffectedRange  `json:"ranges" yaml:"ranges"`
-	Versions []string         `json:"versions,omitempty" yaml:"versions,omitempty"`
+	Package           *AffectedPackage  `json:"package,omitempty"`
+	Ranges            []AffectedRange   `json:"ranges" yaml:"ranges"`
+	Versions          []string          `json:"versions,omitempty" yaml:"versions,omitempty"`
+	EcosystemSpecific map[string]string `json:"ecosystem_specific,omitempty" yaml:"ecosystem_specific,omitempty"`
 }
 
 // AttachExtractedVersionInfo converts the cves.VersionInfo struct to OSV GIT and ECOSYSTEM AffectedRanges and AffectedPackage.
@@ -163,10 +163,11 @@ func (affected *Affected) AttachExtractedVersionInfo(version cves.VersionInfo) {
 
 // PackageInfo is an intermediate struct to ease generating Vulnerability structs.
 type PackageInfo struct {
-	PkgName     string           `json:"pkg_name,omitempty" yaml:"pkg_name,omitempty"`
-	Ecosystem   string           `json:"ecosystem,omitempty" yaml:"ecosystem,omitempty"`
-	PURL        string           `json:"purl,omitempty" yaml:"purl,omitempty"`
-	VersionInfo cves.VersionInfo `json:"fixed_version,omitempty" yaml:"fixed_version,omitempty"`
+	PkgName           string            `json:"pkg_name,omitempty" yaml:"pkg_name,omitempty"`
+	Ecosystem         string            `json:"ecosystem,omitempty" yaml:"ecosystem,omitempty"`
+	PURL              string            `json:"purl,omitempty" yaml:"purl,omitempty"`
+	VersionInfo       cves.VersionInfo  `json:"fixed_version,omitempty" yaml:"fixed_version,omitempty"`
+	EcosystemSpecific map[string]string `json:"ecosystem_specific,omitempty" yaml:"ecosystem_specific,omitempty"`
 }
 
 func (pi *PackageInfo) ToJSON(w io.Writer) error {
@@ -222,6 +223,7 @@ func (v *Vulnerability) AddPkgInfo(pkgInfo PackageInfo) {
 		}
 	}
 
+	// Aggregate commits by their repo, and synthesize a zero introduced commit if necessary.
 	if len(pkgInfo.VersionInfo.AffectedCommits) > 0 {
 		gitCommitRangesByRepo := map[string]AffectedRange{}
 
@@ -229,32 +231,37 @@ func (v *Vulnerability) AddPkgInfo(pkgInfo PackageInfo) {
 
 		for _, ac := range pkgInfo.VersionInfo.AffectedCommits {
 			entry, ok := gitCommitRangesByRepo[ac.Repo]
+			// Create the stub for the repo if necessary.
 			if !ok {
 				entry = AffectedRange{
 					Type:   "GIT",
 					Events: []Event{},
 					Repo:   ac.Repo,
 				}
+
+				if !pkgInfo.VersionInfo.HasIntroducedCommits(ac.Repo) && !hasAddedZeroIntroduced[ac.Repo] {
+					// There was no explicitly defined introduced commit, so create one at 0.
+					entry.Events = append(entry.Events,
+						Event{
+							Introduced: "0",
+						},
+					)
+					hasAddedZeroIntroduced[ac.Repo] = true
+				}
 			}
 
-			if !pkgInfo.VersionInfo.HasIntroducedCommits(ac.Repo) && !hasAddedZeroIntroduced[ac.Repo] {
-				// There was no explicitly defined introduced commit, so create one at 0
-				entry.Events = append(entry.Events,
-					Event{
-						Introduced: "0",
-					},
-				)
-				hasAddedZeroIntroduced[ac.Repo] = true
+			if ac.Introduced != "" {
+				entry.Events = append(entry.Events, Event{Introduced: ac.Introduced})
 			}
-
-			entry.Events = append(entry.Events,
-				Event{
-					Introduced:   ac.Introduced,
-					Fixed:        ac.Fixed,
-					LastAffected: ac.LastAffected,
-					Limit:        ac.Limit,
-				},
-			)
+			if ac.Fixed != "" {
+				entry.Events = append(entry.Events, Event{Fixed: ac.Fixed})
+			}
+			if ac.LastAffected != "" {
+				entry.Events = append(entry.Events, Event{LastAffected: ac.LastAffected})
+			}
+			if ac.Limit != "" {
+				entry.Events = append(entry.Events, Event{Limit: ac.Limit})
+			}
 			gitCommitRangesByRepo[ac.Repo] = entry
 		}
 
@@ -272,12 +279,20 @@ func (v *Vulnerability) AddPkgInfo(pkgInfo PackageInfo) {
 		for _, av := range pkgInfo.VersionInfo.AffectedVersions {
 			if av.Introduced != "" {
 				hasIntroduced = true
+				versionRange.Events = append(versionRange.Events, Event{
+					Introduced: av.Introduced,
+				})
 			}
-			versionRange.Events = append(versionRange.Events, Event{
-				Introduced:   av.Introduced,
-				Fixed:        av.Fixed,
-				LastAffected: av.LastAffected,
-			})
+			if av.Fixed != "" {
+				versionRange.Events = append(versionRange.Events, Event{
+					Fixed: av.Fixed,
+				})
+			}
+			if av.LastAffected != "" {
+				versionRange.Events = append(versionRange.Events, Event{
+					LastAffected: av.LastAffected,
+				})
+			}
 		}
 
 		if !hasIntroduced {
@@ -300,6 +315,7 @@ func (v *Vulnerability) AddPkgInfo(pkgInfo PackageInfo) {
 		return cmp.Compare(a.Repo, b.Repo)
 	})
 
+	affected.EcosystemSpecific = pkgInfo.EcosystemSpecific
 	v.Affected = append(v.Affected, affected)
 }
 
@@ -584,18 +600,9 @@ func FromCVE(id cves.CVEID, cve cves.CVE) (*Vulnerability, []string) {
 		Details: cves.EnglishDescription(cve),
 		Aliases: extractAliases(id, cve),
 	}
-	var err error
 	var notes []string
 	v.Published = cve.Published.Format(time.RFC3339)
-	if err != nil {
-		notes = append(notes, fmt.Sprintf("Failed to parse published date: %v\n", err))
-	}
-
 	v.Modified = cve.LastModified.Format(time.RFC3339)
-	if err != nil {
-		notes = append(notes, fmt.Sprintf("Failed to parse modified date: %v\n", err))
-	}
-
 	v.References = ClassifyReferences(cve.References)
 	v.AddSeverity(cve.Metrics)
 	return &v, notes

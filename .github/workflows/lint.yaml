@@ -20,10 +20,9 @@ on:
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ master ]
-  merge_group:
-    branches: [ master ]
 
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
   lint:
@@ -36,15 +35,15 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - name: Install pipenv
-        run: pip install pipenv==2023.6.12
-      - name: Set up pipenv
-        run: pipenv sync --dev
+      - name: Install poetry
+        run: pip install poetry==1.8.3
+      - name: Set up poetry
+        run: poetry install
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
-          go-version: '>=1.18.0'
+          go-version: '>=1.22.5'
       - name: Set up terraform
         uses: hashicorp/setup-terraform@v2
       - name: Run pylint and yapf, go vet
-        run: pipenv run ./tools/lint_and_format.sh
+        run: poetry run ./tools/lint_and_format.sh

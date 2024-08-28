@@ -22,7 +22,7 @@ import tempfile
 import yaml
 
 from google.cloud import ndb
-import pygit2
+import pygit2.enums
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 import osv
@@ -39,6 +39,7 @@ UNKNOWN_COMMIT = 'unknown'
 # Large projects which take way too long to build.
 # TODO(ochang): Don't hardcode this.
 PROJECT_DENYLIST = {
+    'boringssl',  # https://github.com/google/osv.dev/issues/2178
     'ffmpeg',
     'imagemagick',
     'libreoffice',
@@ -65,7 +66,7 @@ def find_oss_fuzz_fix_via_commit(repo, start_commit, end_commit, source_id,
 
   # Walk through start_commit..end_commit
   try:
-    walker = repo.walk(end_commit, pygit2.GIT_SORT_TOPOLOGICAL)
+    walker = repo.walk(end_commit, pygit2.enums.SortMode.TOPOLOGICAL)
   except KeyError:
     logging.warning('Failed to walk repo with invalid commit: %s', end_commit)
     return None

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Frontend handler tests."""
-import os
 import shutil
 import tempfile
 import unittest
@@ -40,8 +39,8 @@ class FrontendHandlerTest(unittest.TestCase):
   def test_ecosystem_counts(self):
     """Test ecosystem counts aggregates correctly updates."""
     models.Bug(
-        id='BLAH-0',
-        db_id='BLAH-0',
+        id='OSV-0',
+        db_id='OSV-0',
         status=1,
         public=True,
         source='test',
@@ -53,8 +52,8 @@ class FrontendHandlerTest(unittest.TestCase):
         }]).put()
 
     models.Bug(
-        id='BLAH-1',
-        db_id='BLAH-1',
+        id='OSV-1',
+        db_id='OSV-1',
         status=1,
         public=True,
         source='test',
@@ -71,8 +70,8 @@ class FrontendHandlerTest(unittest.TestCase):
         }]).put()
 
     models.Bug(
-        id='BLAH-2',
-        db_id='BLAH-2',
+        id='OSV-2',
+        db_id='OSV-2',
         status=1,
         public=True,
         source='test',
@@ -85,8 +84,8 @@ class FrontendHandlerTest(unittest.TestCase):
 
     # Invalid entries.
     models.Bug(
-        id='BLAH-3',
-        db_id='BLAH-3',
+        id='OSV-3',
+        db_id='OSV-3',
         status=2,
         public=True,
         source='test',
@@ -98,8 +97,8 @@ class FrontendHandlerTest(unittest.TestCase):
         }]).put()
 
     models.Bug(
-        id='BLAH-4',
-        db_id='BLAH-4',
+        id='OSV-4',
+        db_id='OSV-4',
         status=1,
         public=False,
         source='test',
@@ -115,7 +114,6 @@ class FrontendHandlerTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-  os.system('pkill -f datastore')
   ds_emulator = tests.start_datastore_emulator()
   try:
     with ndb.Client().context() as context:
@@ -123,5 +121,4 @@ if __name__ == '__main__':
       context.set_cache_policy(False)
       unittest.main()
   finally:
-    # TODO(ochang): Cleaner way of properly cleaning up processes.
-    os.system('pkill -f datastore')
+    ds_emulator.kill()

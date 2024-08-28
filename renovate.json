@@ -8,7 +8,10 @@
   "labels": ["dependencies"],
   "postUpdateOptions": ["gomodTidy"],
   "osvVulnerabilityAlerts": true,
-  "lockFileMaintenance": { "enabled": true },
+  "lockFileMaintenance": { 
+    "enabled": true,
+    "schedule": ["before 6am on wednesday"]
+  },
   "packageRules": [
     {
       "matchUpdateTypes": ["major"],
@@ -23,6 +26,11 @@
       "matchFileNames": ["gcp/appengine/**"],
       "matchCategories": ["js"],
       "groupName": "appengine-frontend"
+    },
+    {
+      "matchFileNames": ["gcp/api/**"],
+      "matchPackageNames": ["grpcio*"],
+      "enabled": false
     },
     {
       "matchFileNames": ["gcp/api/**"],
@@ -55,12 +63,21 @@
       "groupName": "tools"
     },
     {
+      "matchFileNames": ["deployment/terraform/**"],
+      "groupName": "terraform"
+    },
+    {
       "matchFileNames": [".github/**"],
       "groupName": "workflows"
     },
     {
-      "matchFileNames": ["Pipfile"],
+      "matchFileNames": ["pyproject.toml"],
       "groupName": "osv-lib"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["python"],
+      "enabled": false
     }
   ]
 }

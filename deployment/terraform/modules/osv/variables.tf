@@ -28,6 +28,16 @@ variable "backups_bucket_retention_days" {
   description = "Number of days to retain osv backups"
 }
 
+variable "affected_commits_backups_bucket" {
+  type        = string
+  description = "Name of bucket to backup osv AffectedCommits entries to."
+}
+
+variable "affected_commits_backups_bucket_retention_days" {
+  type        = number
+  description = "Number of days to retain osv AffectedCommits backups"
+}
+
 variable "cve_osv_conversion_bucket" {
   type        = string
   description = "Name of bucket to store converted CVEs in."
@@ -38,6 +48,11 @@ variable "debian_osv_conversion_bucket" {
   description = "Name of bucket to store converted debian advisories in."
 }
 
+variable "osv_dev_sitemap_bucket" {
+  type        = string
+  description = "Name of bucket to store the osv.dev sitemap."
+}
+
 variable "api_url" {
   type        = string
   description = "URL to serve the OSV API on. Domain ownership and DNS settings has to be set up manually."
@@ -46,4 +61,9 @@ variable "api_url" {
 variable "esp_version" {
   type        = string
   description = "ESP version to use for OSV API frontend image."
+}
+
+variable "website_domain" {
+  type        = string
+  description = "Domain to serve the OSV website on. Domain ownership and DNS settings must be manually configured."
 }

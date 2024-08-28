@@ -15,12 +15,14 @@
 package cves
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"path"
+	"reflect"
 	"regexp"
 	"strings"
 	"time"
@@ -39,6 +41,13 @@ type AffectedCommit struct {
 }
 
 func (ac *AffectedCommit) SetRepo(repo string) {
+	// GitHub.com repos are demonstrably case-insensitive, and frequently
+	// expressed in URLs with varying cases, so normalize them to lowercase.
+	// vulns.AddPkgInfo() treats repos case sensitively, and this can result in
+	// incorrect behaviour.
+	if strings.Contains(strings.ToLower(repo), "github.com") {
+		repo = strings.ToLower(repo)
+	}
 	ac.Repo = repo
 }
 
@@ -56,6 +65,33 @@ func (ac *AffectedCommit) SetLimit(commit string) {
 
 func (ac *AffectedCommit) SetLastAffected(commit string) {
 	ac.LastAffected = commit
+}
+
+// Check if the commit range actually spans any commits.
+// A range that starts and ends with the same commit is not considered a valid range.
+func (ac *AffectedCommit) InvalidRange() bool {
+	if ac.Introduced == ac.Fixed && ac.Introduced != "" {
+		return true
+	}
+	if ac.Introduced == ac.LastAffected && ac.Introduced != "" {
+		return true
+	}
+	return false
+}
+
+// Helper function for sorting AffectedCommit for stability.
+// Sorts by Repo, then Fixed, then LastAffected, then Introduced.
+func AffectedCommitCompare(i, j AffectedCommit) int {
+	if n := cmp.Compare(i.Repo, j.Repo); n != 0 {
+		return n
+	}
+	if n := cmp.Compare(i.Fixed, j.Fixed); n != 0 {
+		return n
+	}
+	if n := cmp.Compare(i.LastAffected, j.LastAffected); n != 0 {
+		return n
+	}
+	return cmp.Compare(i.Introduced, j.Introduced)
 }
 
 type AffectedVersion struct {
@@ -88,8 +124,8 @@ func (vi *VersionInfo) HasLastAffectedVersions() bool {
 }
 
 func (vi *VersionInfo) HasIntroducedCommits(repo string) bool {
-	for _, av := range vi.AffectedCommits {
-		if av.Repo == repo && av.Introduced != "" {
+	for _, ac := range vi.AffectedCommits {
+		if strings.EqualFold(ac.Repo, repo) && ac.Introduced != "" {
 			return true
 		}
 	}
@@ -97,8 +133,8 @@ func (vi *VersionInfo) HasIntroducedCommits(repo string) bool {
 }
 
 func (vi *VersionInfo) HasFixedCommits(repo string) bool {
-	for _, av := range vi.AffectedCommits {
-		if av.Repo == repo && av.Fixed != "" {
+	for _, ac := range vi.AffectedCommits {
+		if strings.EqualFold(ac.Repo, repo) && ac.Fixed != "" {
 			return true
 		}
 	}
@@ -106,8 +142,17 @@ func (vi *VersionInfo) HasFixedCommits(repo string) bool {
 }
 
 func (vi *VersionInfo) HasLastAffectedCommits(repo string) bool {
-	for _, av := range vi.AffectedCommits {
-		if av.Repo == repo && av.LastAffected != "" {
+	for _, ac := range vi.AffectedCommits {
+		if strings.EqualFold(ac.Repo, repo) && ac.LastAffected != "" {
+			return true
+		}
+	}
+	return false
+}
+
+func (vi *VersionInfo) HasLimitCommits(repo string) bool {
+	for _, ac := range vi.AffectedCommits {
+		if strings.EqualFold(ac.Repo, repo) && ac.Limit != "" {
 			return true
 		}
 	}
@@ -115,21 +160,53 @@ func (vi *VersionInfo) HasLastAffectedCommits(repo string) bool {
 }
 
 func (vi *VersionInfo) FixedCommits(repo string) (FixedCommits []string) {
-	for _, av := range vi.AffectedCommits {
-		if av.Repo == repo && av.Fixed != "" {
-			FixedCommits = append(FixedCommits, av.Fixed)
+	for _, ac := range vi.AffectedCommits {
+		if strings.EqualFold(ac.Repo, repo) && ac.Fixed != "" {
+			FixedCommits = append(FixedCommits, ac.Fixed)
 		}
 	}
 	return FixedCommits
 }
 
 func (vi *VersionInfo) LastAffectedCommits(repo string) (LastAffectedCommits []string) {
-	for _, av := range vi.AffectedCommits {
-		if av.Repo == repo && av.LastAffected != "" {
-			LastAffectedCommits = append(LastAffectedCommits, av.Fixed)
+	for _, ac := range vi.AffectedCommits {
+		if strings.EqualFold(ac.Repo, repo) && ac.LastAffected != "" {
+			LastAffectedCommits = append(LastAffectedCommits, ac.Fixed)
 		}
 	}
 	return LastAffectedCommits
+}
+
+// Check if the same commit appears in multiple fields of the AffectedCommits array.
+// See https://github.com/google/osv.dev/issues/1984 for more context.
+func (vi *VersionInfo) Duplicated(candidate AffectedCommit) bool {
+	fieldsToCheck := []string{"Introduced", "LastAffected", "Limit", "Fixed"}
+
+	// Get the commit hash to look for.
+	v := reflect.ValueOf(&candidate).Elem()
+
+	commit := ""
+	for _, field := range fieldsToCheck {
+		commit = v.FieldByName(field).String()
+		if commit != "" {
+			break
+		}
+	}
+	if commit == "" {
+		return false
+	}
+
+	// Look through what is already present.
+	for _, ac := range vi.AffectedCommits {
+		v = reflect.ValueOf(&ac).Elem()
+		for _, field := range fieldsToCheck {
+			existingCommit := v.FieldByName(field).String()
+			if existingCommit == commit {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // Synthetic enum of supported commit types.
@@ -158,384 +235,52 @@ type CPE struct {
 }
 
 var (
-	// TODO(apollock): read this from an external file
 	InvalidRepos = []string{
-		"https://github.com/0day1/g1ory",
-		"https://github.com/0x14dli/ffos-SQL-injection-vulnerability-exists",
-		"https://github.com/0x72303074/cve-disclosures",
-		"https://github.com/0xdea/exploits",
-		"https://github.com/0xxtoby/Vuldb",
-		"https://github.com/10cks/inkdropPoc",
-		"https://github.com/10cksyiqiyinhangzhoutechnology/elf-parser_segments_poc",
-		"https://github.com/1MurasaKi/Eyewear_Shop_XSS",
-		"https://github.com/1MurasaKi/PizzeXSS_Report",
-		"https://github.com/1MurasaKi/STMS_CSRF",
-		"https://github.com/1security/Vulnerability",
-		"https://github.com/202ecommerce/security-advisories",
-		"https://github.com/abhiunix/goo-blog-App-CVE",
-		"https://github.com/Accenture/AARO-Bugs",
-		"https://github.com/active-labs/Advisories",
-		"https://github.com/ae6e361b/online-job-portal-forget",
-		"https://github.com/afeng2016-s/CVE-Request",
-		"https://github.com/agadient/SERVEEZ-CVE",
-		"https://github.com/Airrudder/vuls",
-		"https://github.com/AlwaysHereFight/YZMCMSxss",
-		"https://github.com/alwentiu/COVIDSafe-CVE-2020-12856",
-		"https://github.com/anhdq201/rukovoditel",
-		"https://github.com/anhdq201/webtareas",
-		"https://github.com/anvilsecure/garmin-ciq-app-research",
-		"https://github.com/anx0ing/CVE_demo",
-		"https://github.com/Anza2001/IOT_VULN",
-		"https://github.com/apriorit/pentesting",
-		"https://github.com/ArianeBlow/Axelor_Stored_XSS",
-		"https://github.com/As4ki/CVE-report",
-		"https://github.com/A-TGAO/MxsDocVul",
-		"https://github.com/atredispartners/advisories",
-		"https://github.com/awillix/research",
-		"https://github.com/b17fr13nds/MPlayer_cve_poc",
-		"https://github.com/badboycxcc/Student-Admission-Sqlinjection",
-		"https://github.com/badboycxcc/Student-Admission-Xss",
-		"https://github.com/beicheng-maker/vulns",
-		"https://github.com/benjaminpsinclair/netdisco-2023-advisory",
-		"https://github.com/BigTiger2020/2022",
-		"https://github.com/BigTiger2020/2023-1",
-		"https://github.com/BigTiger2020/74CMS",
-		"https://github.com/BigTiger2020/Fantastic-Blog-CMS-",
-		"https://github.com/BigTiger2020/Theme-Park-Ticketing-System",
-		"https://github.com/BigTiger2020/UCMS",
-		"https://github.com/BlackFan/client-side-prototype-pollution",
-		"https://github.com/blindkey/cve_like",
-		"https://github.com/BLL-l/vulnerability_wiki",
-		"https://github.com/blockomat2100/PoCs",
-		"https://github.com/bosslabdcu/Vulnerability-Reporting",
-		"https://github.com/ByteHackr/unzip_poc",
-		"https://github.com/capgeminicisredteam/disclosure",
-		"https://github.com/CapgeminiCisRedTeam/Disclosure",
-		"https://github.com/Castle1984/CveRecord",
-		"https://github.com/ch0ing/vul",
-		"https://github.com/Ch0pin/security-advisories",
-		"https://github.com/chenan224/webchess_sqli_poc",
-		"https://github.com/Chu1z1/Chuizi",
-		"https://github.com/ciph0x01/poc",
-		"https://github.com/ciph0x01/Simple-Exam-Reviewer-Management-System-CVE",
-		"https://github.com/cloudflare/advisories",
-		"https://github.com/Coalfire-Research/WinAPRS-Exploits",
 		"https://github.com/ComparedArray/printix-CVE-2022-25089",
-		"https://github.com/cribdragg3r/offensive_research",
-		"https://github.com/ctflearner/Vulnerability",
-		"https://github.com/CVEProject/cvelist", // Heavily in Advisory URLs, sometimes shows up elsewhere
-		"https://github.com/cve-vul/vul",
-		"https://github.com/Cvjark/Poc",
-		"https://github.com/cxaqhq/Loan-Management-System-Sqlinjection",
-		"https://github.com/cyb3r-n3rd/cve-request",
-		"https://github.com/cybersecurityworks/disclosed",
-		"https://github.com/D4rkP0w4r/AeroCMS-Add_Posts-Stored_XSS-Poc",
-		"https://github.com/D4rkP0w4r/AeroCMS-Comment-Stored_XSS-Poc",
-		"https://github.com/D4rkP0w4r/AeroCMS-Unrestricted-File-Upload-POC",
-		"https://github.com/D4rkP0w4r/Full-Ecommece-Website-Add_Product-Unrestricted-File-Upload-RCE-POC",
-		"https://github.com/D4rkP0w4r/Full-Ecommece-Website-Add_User-Stored-XSS-POC",
-		"https://github.com/D4rkP0w4r/Full-Ecommece-Website-Slides-Unrestricted-File-Upload-RCE-POC",
-		"https://github.com/D4rkP0w4r/sms-Add_Student-Stored_XSS-POC",
-		"https://github.com/D4rkP0w4r/sms-Unrestricted-File-Upload-RCE-POC",
-		"https://github.com/daaaalllii/cve-s",
-		"https://github.com/DayiliWaseem/CVE-2022-39196-",
-		"https://github.com/dhammon/pfBlockerNg-CVE-2022-40624",
-		"https://github.com/dhammon/pfBlockerNg-RCE",
-		"https://github.com/Dheeraj-Deshmukh/Hospital-s-patient-management-system",
-		"https://github.com/Dheeraj-Deshmukh/stored-xss-in-Hospital-s-Patient-Records-Management-System",
-		"https://github.com/digitemis/advisory",
-		"https://github.com/DiliLearngent/BugReport",
-		"https://github.com/Dir0x/Multiple-SQLi-in-Simple-Subscription-Company",
-		"https://github.com/Dir0x/SQLi-exploit---Simple-Client-Management-System",
-		"https://github.com/DisguisedRoot/Exploit",
-		"https://github.com/dodge-mptc/cve-2023-35793-csrf-on-web-ssh",
-		"https://github.com/Don-H50/wp-vul",
-		"https://github.com/dota-st/Vulnerability",
-		"https://github.com/draco1725/POC",
-		"https://github.com/draco1725/Stored-XSS",
-		"https://github.com/Drun1baby/CVE_Pentest",
-		"https://github.com/dtssec/CVE-Disclosures",
-		"https://github.com/Durian1546/vul",
-		"https://github.com/Dyrandy/BugBounty",
-		"https://github.com/E1CHO/cve_hub",
-		"https://github.com/E1CHO/water_cve",
-		"https://github.com/eddietcc/CVEnotes",
-		"https://github.com/Edubr2020/RealPlayer_G2_RCE",
-		"https://github.com/Edubr2020/RP_DCP_Code_Exec",
-		"https://github.com/Edubr2020/RP_Import_RCE",
-		"https://github.com/enesozeser/Vulnerabilities",
-		"https://github.com/Ephemeral1y/Vulnerability",
-		"https://github.com/erengozaydin/College-Management-System-course_code-SQL-Injection-Authenticated",
-		"https://github.com/erengozaydin/Microfinance-Management-System-V1.0-SQL-Injection-Vulnerability-Unauthenticated",
-		"https://github.com/erengozaydin/Royal-Event-Management-System-todate-SQL-Injection-Authenticated",
-		"https://github.com/esp0xdeadbeef/rce_webmin",
-		"https://github.com/etn0tw/cmscve_test",
-		"https://github.com/f4cky0u/security-vulnerabilities",
-		"https://github.com/Fadavvi/CVE-2018-17431-PoC",
-		"https://github.com/FCncdn/Appsmith-Js-Injection-POC",
-		"https://github.com/Filiplain/LFI-to-RCE-SE-Suite-2.0",
-		"https://github.com/fireeye/Vulnerability-Disclosures",
-		"https://github.com/frame84/vulns",
-		"https://github.com/Frank-Z7/z-vulnerabilitys",
-		"https://github.com/FusionAuth/fusionauth-issues",
-		"https://github.com/gdianq/Gym-Management-Exercises-Sqlinjection",
-		"https://github.com/gdianq/Gym-Management-System-loginpage-Sqlinjection",
-		"https://github.com/gdianq/Gym-Management-System-Sqlinjection",
-		"https://github.com/gdianq/Sparkz-Hotel-Management-loginpage-Sqlinjection",
-		"https://github.com/github/cvelist", // Fork of https://github.com/CVEProject/cvelist
+		"https://github.com/CVEProject/cvelist",
+		"https://github.com/github/cvelist", // Heavily in Advisory URLs, sometimes shows up elsewhere
 		"https://github.com/github/securitylab",
-		"https://github.com/gitlabhq/gitlabhq",     // GitHub mirror, not canonical
-		"https://github.com/google/oss-fuzz-vulns", // 8^)
-		"https://github.com/gou-web/Parking-management-systemXSS-",
-		"https://github.com/Gr4y21/My-CVE-IDs",
-		"https://github.com/grafana/bugbounty",
-		"https://github.com/guyinatuxedo/sqlite3_record_leaking",
-		"https://github.com/GZRsecurity/Cve-System",
-		"https://github.com/h4md153v63n/CVE-2022-40032_Simple-Task-Managing-System-V1.0-SQL-Injection-Vulnerability-Unauthenticated",
-		"https://github.com/h4md153v63n/CVE-2022-40347_Intern-Record-System-phone-V1.0-SQL-Injection-Vulnerability-Unauthenticated",
-		"https://github.com/h4md153v63n/CVE-2022-40348_Intern-Record-System-Cross-site-Scripting-V1.0-Vulnerability-Unauthenticated",
-		"https://github.com/H4rk3nz0/PenTesting",
-		"https://github.com/Ha0Liu/cveAdd",
-		"https://github.com/hackerzyq/mycve",
-		"https://github.com/Hakcoder/Simple-Online-Public-Access-Catalog-OPAC---SQL-injection",
-		"https://github.com/Hanfu-l/Cve-vulnerability-mining",
-		"https://github.com/Hanfu-l/POC-Exp",
-		"https://github.com/Hanwengao/CVERequests",
-		"https://github.com/hashicorp/terraform-enterprise-release-notes",
-		"https://github.com/haxpunk1337/Enterprise-Survey-Software",
-		"https://github.com/haxpunk1337/MDaemon-",
-		"https://github.com/hemantsolo/CVE-Reference",
-		"https://github.com/HH1F/KbaseDoc-v1.0-Arbitrary-file-deletion-vulnerability",
-		"https://github.com/hkerma/opa-gatekeeper-concurrency-issue",
-		"https://github.com/hmsec/advisories",
-		"https://github.com/hnsecurity/vulns",
-		"https://github.com/hotencode/CveHub",
-		"https://github.com/hubenlab/hubenvullist",
-		"https://github.com/huclilu/CVE_Add",
-		"https://github.com/Hyperkopite/Roothub_vulns",
-		"https://github.com/i3umi3iei3ii/CentOS-Control-Web-Panel-CVE",
-		"https://github.com/ianxtianxt/gitbook-xss",
-		"https://github.com/imsebao/404team",
-		"https://github.com/InfoSecWarrior/Offensive-Payloads",
-		"https://github.com/IthacaLabs/DevExpress",
-		"https://github.com/IthacaLabs/Parallels",
-		"https://github.com/IthacaLabs/Vsourz-Digital",
-		"https://github.com/itodaro/doorGets_cve",
-		"https://github.com/JackyG0/Online-Accreditation-Management-System-v1.0-SQLi",
-		"https://github.com/jacky-y/vuls",
-		"https://github.com/Jamison2022/Company-Website-CMS",
-		"https://github.com/Jamison2022/Wedding-Hall-Booking-System",
-		"https://github.com/jcarabantes/Bus-Vulnerabilities",
-		"https://github.com/jingping911/exshopbug",
-		"https://github.com/jiy2020/bugReport",
-		"https://github.com/jlleitschuh/security-research",
-		"https://github.com/joinia/webray.com.cn",
-		"https://github.com/JunyanYip/itsourcecode_justines_xss_vul",
-		"https://github.com/jusstSahil/CSRF-",
-		"https://github.com/jvz/test-cvelist",
-		"https://github.com/k0xx11/Vulscve",
-		"https://github.com/k0xx11/vul-wiki",
-		"https://github.com/kaoudis/advisories",
-		"https://github.com/Kenun99/CVE-batdappboomx",
-		"https://github.com/Keyvanhardani/Exploit-eShop-Multipurpose-Ecommerce-Store-Website-3.0.4-Cross-Site-Scripting-XSS",
-		"https://github.com/killmonday/isic.lk-RCE",
-		"https://github.com/KingBridgeSS/Online_Driving_School_Project_In_PHP_With_Source_Code_Vulnerabilities",
-		"https://github.com/kirra-max/bug_reports",
-		"https://github.com/Kitsun3Sec/exploits",
-		"https://github.com/kk98kk0/exploit",
-		"https://github.com/KLSEHB/vulnerability-report",
-		"https://github.com/kmkz/exploit",
-		"https://github.com/kyrie403/Vuln",
-		"https://github.com/L1917/Fast-Food-Ordering-System",
-		"https://github.com/l1nk3rlin/php_code_audit_project",
-		"https://github.com/lakshaya0557/POCs",
-		"https://github.com/laotun-s/POC",
-		"https://github.com/leekenghwa/CVE-2023-33817---SQL-Injection-found-in-HotelDruid-3.0.5",
-		"https://github.com/leekenghwa/CVE-2023-34830---Reflected-XSS-found-in-I-doit-Open-v24-and-below",
-		"https://github.com/Lemon4044/Fast-Food-Ordering-System",
-		"https://github.com/LeozhangCA/CVEReport",
-		"https://github.com/lohyt/Persistent-Cross-Site-Scripting-found-in-Online-Jewellery-Store-from-Sourcecodester-website.",
-		"https://github.com/lohyt/web-shell-via-file-upload-in-hocms",
-		"https://github.com/luelueking/ruoyi-4.7.5-vuln-poc",
-		"https://github.com/lukaszstu/SmartAsset-CORS-CVE-2020-26527",
-		"https://github.com/ly1g3/Mailcow-CVE-2022-31138",
-		"https://github.com/M9KJ-TEAM/CVEReport",
-		"https://github.com/MacherCS/CVE_Evoh_Contract",
-		"https://github.com/MaherAzzouzi/CVE-2022-37706-LPE-exploit",
-		"https://github.com/mandiant/Vulnerability-Disclosures",
-		"https://github.com/martinkubecka/CVE-References",
-		"https://github.com/Matrix07ksa/ALLMediaServer-1.6-Buffer-Overflow",
-		"https://github.com/mclab-hbrs/BBB-POC",
-		"https://github.com/metaredteam/external-disclosures",
-		"https://github.com/metaStor/Vuls",
-		"https://github.com/mikeccltt/0525",
-		"https://github.com/mikeccltt/0724",
-		"https://github.com/mikeccltt/automotive",
-		"https://github.com/mikeccltt/badminton-center-management-system",
-		"https://github.com/mikeccltt/bug_report_CVE",
-		"https://github.com/mikeccltt/chatbot",
-		"https://github.com/mikeccltt/wbms_bug_report",
-		"https://github.com/mikeisastar/counter-strike-arbitrary-file-read",
-		"https://github.com/Mirantis/security",
-		"https://github.com/mirchr/security-research",
-		"https://github.com/MiserablefaithL/CVERequestReport",
-		"https://github.com/mrojz/rconfig-exploit",
-		"https://github.com/MrR3boot/CVE-Hunting",
-		"https://github.com/Mr-Secure-Code/My-CVE",
-		"https://github.com/MrTuxracer/advisories",
-		"https://github.com/mudassiruddin/CVE-2022-43144-Stored-XSS",
-		"https://github.com/N1ce759/74cmsSE-Arbitrary-File-Reading",
-		"https://github.com/nam3lum/msi-central_privesc",
-		"https://github.com/navaidzansari/cve_demo",
-		"https://github.com/navaidzansari/CVE_Demo",
-		"https://github.com/nepenthe0320/cve_poc",
-		"https://github.com/Netflix/security-bulletins",
-		"https://github.com/nextcloud/security-advisories",
-		"https://github.com/nikip72/CVE-2021-39273-CVE-2021-39274",
-		"https://github.com/novysodope/vulreq",
-		"https://github.com/nsparker1337/OpenSource",
-		"https://github.com/nu11secur1ty/CVE-nu11secur1ty",
-		"https://github.com/offsecin/bugsdisclose",
-		"https://github.com/orangecertcc/security-research",
-		"https://github.com/Orange-Cyberdefense/CVE-repository",
-		"https://github.com/oV201/cve_report",
-		"https://github.com/Ozozuz/Qlik-View-Stored-XSS",
-		"https://github.com/p0dalirius/CVE-2022-26159-Ametys-Autocompletion-XML",
-		"https://github.com/PabloMK7/ENLBufferPwn",
-		"https://github.com/palantir/security-bulletins",
-		"https://github.com/passtheticket/vulnerability-research",
-		"https://github.com/Peanut886/Vulnerability",
-		"https://github.com/piuppi/proof-of-concepts",
-		"https://github.com/playZG/Exploit-",
-		"https://github.com/PostalBlab/Vulnerabilities",
-		"https://github.com/post-cyberlabs/CVE-Advisory",
-		"https://github.com/prismbreak/vulnerabilities",
-		"https://github.com/purplededa/EasyoneCRM-5.50.02-SQLinjection",
-		"https://github.com/PurplePetrus/MxCC_Credential-Storage_issue",
-		"https://github.com/Q2Flc2FySec/CVE-List",
-		"https://github.com/qwegz/CveList",
-		"https://github.com/qyhmsys/cve-list",
-		"https://github.com/Ramansh123454/POCs",
-		"https://github.com/rand0midas/randomideas",
-		"https://github.com/raozhir/CVERequest",
+		"https://github.com/gitlabhq/gitlabhq", // GitHub mirror, not canonical
+		"https://github.com/n0Sleeper/bosscmsVuln",
 		"https://github.com/rapid7/metasploit-framework",
-		"https://github.com/refi64/CVE-2020-25265-25266",
-		"https://github.com/riteshgohil/My_CVE_References",
-		"https://github.com/rohit0x5/poc",
-		"https://github.com/roughb8722/CVE-2021-3122-Details",
-		"https://github.com/rsrahulsingh05/POC",
-		"https://github.com/rtcrowley/poc",
-		"https://github.com/rumble773/sec-research",
-		"https://github.com/RupturaInfoSec/CVE-2023-26563-26564-26565",
-		"https://github.com/Ryan0lb/EC-cloud-e-commerce-system-CVE-application",
-		"https://github.com/s1kr10s/EasyChatServer-DOS",
-		"https://github.com/saitamang/POC-DUMP",
-		"https://github.com/sartlabs/0days",
-		"https://github.com/SaumyajeetDas/POC-of-CVE-2022-36271",
-		"https://github.com/SaumyajeetDas/Vulnerability",
-		"https://github.com/sdpyly/bug_report_canteen",
-		"https://github.com/seb1055/cve-2020-27358-27359",
-		"https://github.com/secf0ra11/secf0ra11.github.io",
-		"https://github.com/Security-AVS/-CVE-2021-26904",
-		"https://github.com/securylight/CVES_write_ups",
-		"https://github.com/seizer-zyx/Vulnerability",
-		"https://github.com/seqred-s-a/gxdlmsdirector-cve",
-		"https://github.com/Serces-X/vul_report",
-		"https://github.com/shellshok3/Cross-Site-Scripting-XSS",
-		"https://github.com/sickcodes/security",
-		"https://github.com/silence-silence/xxl-job-lateral-privilege-escalation-vulnerability-",
-		"https://github.com/sinemsahn/POC",
-		"https://github.com/sleepyvv/vul_report",
-		"https://github.com/Snakinya/Vuln",
-		"https://github.com/snyk/zip-slip-vulnerability",
-		"https://github.com/soheilsamanabadi/vulnerability",
-		"https://github.com/soheilsamanabadi/vulnerabilitys",
-		"https://github.com/soundarkutty/stored-xss",
-		"https://github.com/souravkr529/CSRF-in-Cold-Storage-Management-System",
-		"https://github.com/spwpun/ntp-4.2.8p15-cves",
-		"https://github.com/sromanhu/Cmsmadesimple-CMS-Stored-XSS",
-		"https://github.com/sromanhu/CSZ-CMS-Stored-XSS---Pages-Content",
-		"https://github.com/sromanhu/CVE-2023-43339-CMSmadesimple-Reflected-XSS---Installation",
-		"https://github.com/sromanhu/CVE-2023-43878-RiteCMS-Stored-XSS---MainMenu",
-		"https://github.com/sromanhu/e107-CMS-Stored-XSS---Manage",
-		"https://github.com/sromanhu/RiteCMS-Stored-XSS---Home",
 		"https://github.com/starnightcyber/miscellaneous",
-		"https://github.com/strangebeecorp/security",
-		"https://github.com/sunset-move/EasyImages2.0-arbitrary-file-download-vulnerability",
-		"https://github.com/SunshineOtaku/Report-CVE",
-		"https://github.com/superkojiman/vulnerabilities",
-		"https://github.com/syz913/cve-reports",
-		"https://github.com/TCSWT/Baby-Care-System",
-		"https://github.com/the-emmons/CVE-Disclosures",
-		"https://github.com/thehackingverse/Stored-xss-",
-		"https://github.com/theyiyibest/Reflected-XSS-on-SockJS",
-		"https://github.com/tht1997/CVE_2023",
-		"https://github.com/TishaManandhar/Superstore-sql-poc",
-		"https://github.com/toyydsBT123/One_of_my_take_on_SourceCodester",
-		"https://github.com/Tr0e/CVE_Hunter",
-		"https://github.com/transcendent-group/advisories",
-		"https://github.com/tremwil/ds3-nrssr-rce",
-		"https://github.com/trinity-syt-security/xss_vuln_issue",
-		"https://github.com/Trinity-SYT-SECURITY/XSS_vuln_issue",
-		"https://github.com/uBlockOrigin/uBlock-issues",
-		"https://github.com/umarfarook882/avast_multiple_vulnerability_disclosure",
-		"https://github.com/upasvi/CVE-",
-		"https://github.com/v2ish1yan/mycve",
-		"https://github.com/verf1sh/Poc",
-		"https://github.com/versprite/research",
-		"https://github.com/vickysuper/Cve_report",
-		"https://github.com/VivekPanday12/CVE-",
-		"https://github.com/vQAQv/Request-CVE-ID-PoC",
-		"https://github.com/vulnerabilities-cve/vulnerabilities",
-		"https://github.com/vuls/vuls",
-		"https://github.com/wagnerdracha/ProofOfConcept",
-		"https://github.com/wandera/public-disclosures",
-		"https://github.com/Wh04m1001/ZoneAlarmEoP",
-		"https://github.com/whiex/c2Rhc2Rhc2Q-",
-		"https://github.com/whitehatl/Vulnerability",
-		"https://github.com/wind-cyber/LJCMS-UserTraversal-Vulnerability",
-		"https://github.com/wkeyi0x1/vul-report",
-		"https://github.com/wsummerhill/BSA-Radar_CVE-Vulnerabilities",
-		"https://github.com/wucwu1/CVEApplication",
-		"https://github.com/xcodeOn1/xcode0x-CVEs",
-		"https://github.com/xf1les/cve-advisories",
-		"https://github.com/xiahao90/CVEproject",
-		"https://github.com/XIAONIGM/CVEReport",
-		"https://github.com/xidaner/CVE_HUNTER",
-		"https://github.com/xnobody12/jaws-cms-rce",
-		"https://github.com/Xor-Gerke/webray.com.cn",
-		"https://github.com/xunyang1/my-vulnerability",
-		"https://github.com/xxhzz1/74cmsSE-Arbitrary-file-upload-vulnerability",
-		"https://github.com/y1s3m0/vulnfind",
-		"https://github.com/yasinyildiz26/Badminton-Center-Management-System",
-		"https://github.com/YavuzSahbaz/Limbas-4.3.36.1319-is-vulnerable-to-Cross-Site-Scripting-XSS-",
-		"https://github.com/YavuzSahbaz/Red-Planet-Laundry-Management-System-1.0-is-vulnerable-to-SQL",
-		"https://github.com/ycdxsb/Vuln",
-		"https://github.com/ykosan1/Simple-Task-Scheduling-System-id-SQL-Injection-Unauthenticated",
-		"https://github.com/YLoiK/74cmsSE-Arbitrary-file-upload-vulnerability",
-		"https://github.com/YorkLee53645349/Cve_report",
-		"https://github.com/Yp1oneer/cve_hub",
-		"https://github.com/YZLCQX/Mailbox-remote-command-execution",
-		"https://github.com/z00z00z00/Safenet_SAC_CVE-2021-42056",
-		"https://github.com/zer0yu/CVE_Request",
-		"https://github.com/zerrr0/Zerrr0_Vulnerability",
-		"https://github.com/Zeyad-Azima/Issabel-stored-XSS",
-		"https://github.com/zhao1231/cve_payload",
-		"https://github.com/ZhuoNiBa/Delta-DIAEnergie-XSS",
-		"https://github.com/Zoe0427/YJCMS",
-		"https://github.com/zzh-newlearner/record",
-		"https://gitlab.com/FallFur/exploiting-unprotected-admin-funcionalities-on-besder-ip-cameras",
 		"https://gitlab.com/gitlab-org/gitlab-ce",      // redirects to gitlab-foss
 		"https://gitlab.com/gitlab-org/gitlab-ee",      // redirects to gitlab
 		"https://gitlab.com/gitlab-org/gitlab-foss",    // not the canonical source
 		"https://gitlab.com/gitlab-org/omnibus-gitlab", // not the source
-		"https://gitlab.com/gitlab-org/release",        // not the source
-		"https://gitlab.com/kop316/vvm-disclosure",
-		"https://gitlab.com/-/snippets/1937042",
-		"https://gitlab.com/yongchuank/avast-aswsnx-ioctl-82ac0060-oob-write",
 	}
-	InvalidRepoRegex = `(?i)/(?:(?:CVEs?)|(?:CVE-\d{4}-\d{4,})(?:/?.*)?|bug_report(?:/.*)?|GitHubAssessments/.*)$`
+	InvalidRepoRegex = `(?i)/(?:(?:CVEs?)|(?:CVE-\d{4}-\d{4,})(?:/?.*)?|bug_report(?:/.*)?|GitHubAssessments/.*)`
 )
+
+// Rewrites known GitWeb URLs to their base repository.
+func repoGitWeb(parsedURL *url.URL) (string, error) {
+	// These repos seem to only be cloneable over git:// not https://
+	//
+	// The frontend code needs to be taught how to rewrite these back to
+	// something clickable for humans in
+	// https://github.com/google/osv.dev/blob/master/gcp/appengine/source_mapper.py
+	//
+	var gitProtocolHosts = []string{
+		"git.code-call-cc.org",
+		"git.gnupg.org",
+		"git.infradead.org",
+	}
+	params := strings.Split(parsedURL.RawQuery, ";")
+	for _, param := range params {
+		if !strings.HasPrefix(param, "p=") {
+			continue
+		}
+		repo, err := url.JoinPath(strings.TrimSuffix(strings.TrimSuffix(parsedURL.Path, "/gitweb.cgi"), "cgi-bin"), strings.Split(param, "=")[1])
+		if err != nil {
+			return "", err
+		}
+		if slices.Contains(gitProtocolHosts, parsedURL.Hostname()) {
+			return fmt.Sprintf("git://%s%s", parsedURL.Hostname(), repo), nil
+		}
+		return fmt.Sprintf("https://%s%s", parsedURL.Hostname(), repo), nil
+	}
+	return "", fmt.Errorf("unsupported GitWeb URL: %s", parsedURL.String())
+}
 
 // Returns the base repository URL for supported repository hosts.
 func Repo(u string) (string, error) {
@@ -546,13 +291,14 @@ func Repo(u string) (string, error) {
 		"gitlab.org",
 		"opendev.org",
 		"pagure.io",
+		"sourceware.org",
 		"xenbits.xen.org",
 	}
 	var supportedHostPrefixes = []string{
 		"git",
 		"gitlab",
 	}
-	parsedURL, err := url.Parse(u)
+	parsedURL, err := url.Parse(strings.TrimSuffix(u, "/"))
 	if err != nil {
 		return "", err
 	}
@@ -571,11 +317,10 @@ func Repo(u string) (string, error) {
 
 	// Were we handed a base repository URL from the get go?
 	if slices.Contains(supportedHosts, parsedURL.Hostname()) || slices.Contains(supportedHostPrefixes, strings.Split(parsedURL.Hostname(), ".")[0]) {
-		pathParts := strings.Split(strings.TrimSuffix(parsedURL.Path, "/"), "/")
-		if len(pathParts) == 3 && parsedURL.Path != "/cgi-bin/gitweb.cgi" {
+		pathParts := strings.Split(parsedURL.Path, "/")
+		if len(pathParts) == 3 && !strings.Contains(parsedURL.Path, "gitweb") && parsedURL.Hostname() != "sourceware.org" {
 			return fmt.Sprintf("%s://%s%s", parsedURL.Scheme,
-					parsedURL.Hostname(),
-					strings.TrimSuffix(parsedURL.Path, "/")),
+					parsedURL.Hostname(), parsedURL.Path),
 				nil
 		}
 		// GitLab can have a deeper structure to a repo (projects can be within nested groups)
@@ -589,18 +334,25 @@ func Repo(u string) (string, error) {
 				strings.Contains(parsedURL.Path, "security/advisories") ||
 				strings.Contains(parsedURL.Path, "issues")) {
 			return fmt.Sprintf("%s://%s%s", parsedURL.Scheme,
-					parsedURL.Hostname(),
-					strings.TrimSuffix(parsedURL.Path, "/")),
+					parsedURL.Hostname(), parsedURL.Path),
 				nil
 		}
 		if len(pathParts) == 2 && parsedURL.Hostname() == "git.netfilter.org" {
 			return fmt.Sprintf("%s://%s%s", parsedURL.Scheme,
-					parsedURL.Hostname(),
-					strings.TrimSuffix(parsedURL.Path, "/")),
+					parsedURL.Hostname(), parsedURL.Path),
 				nil
 		}
 		if len(pathParts) >= 2 && parsedURL.Hostname() == "git.ffmpeg.org" {
 			return fmt.Sprintf("%s://%s/%s", parsedURL.Scheme, parsedURL.Hostname(), pathParts[2]), nil
+		}
+		if parsedURL.Hostname() == "sourceware.org" {
+			// Call out to common function for GitWeb URLs
+			return repoGitWeb(parsedURL)
+		}
+		if parsedURL.Hostname() == "git.postgresql.org" {
+			// PostgreSQL's GitWeb is at a different path to its Git repo.
+			parsedURL.Path = strings.Replace(parsedURL.Path, "gitweb", "git", 1)
+			return repoGitWeb(parsedURL)
 		}
 		if strings.HasSuffix(parsedURL.Path, ".git") {
 			return fmt.Sprintf("%s://%s%s", parsedURL.Scheme,
@@ -645,17 +397,16 @@ func Repo(u string) (string, error) {
 	// https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;h=11d171f1910b508a81d21faa087ad1af573407d8 -> git://sourceware.org/git/binutils-gdb.git
 	if strings.HasSuffix(parsedURL.Path, "/gitweb.cgi") &&
 		strings.HasPrefix(parsedURL.RawQuery, "p=") {
-		params := strings.Split(parsedURL.RawQuery, ";")
-		for _, param := range params {
-			if !strings.HasPrefix(param, "p=") {
-				continue
-			}
-			repo, err := url.JoinPath(strings.TrimSuffix(strings.TrimSuffix(parsedURL.Path, "/gitweb.cgi"), "cgi-bin"), strings.Split(param, "=")[1])
-			if err != nil {
-				return "", err
-			}
-			return fmt.Sprintf("git://%s%s", parsedURL.Hostname(), repo), nil
-		}
+		return repoGitWeb(parsedURL)
+	}
+
+	// Variations of Git Web URLs, e.g.
+	// https://git.tukaani.org/?p=xz.git;a=tags
+
+	// starts with a supported host and querystring contains p=\*.git
+	if (slices.Contains(supportedHosts, parsedURL.Hostname()) || slices.Contains(supportedHostPrefixes, strings.Split(parsedURL.Hostname(), ".")[0])) &&
+		(strings.HasPrefix(parsedURL.RawQuery, "p=") && strings.Contains(parsedURL.RawQuery, ".git")) {
+		return repoGitWeb(parsedURL)
 	}
 
 	// cgit.freedesktop.org is a special snowflake with enough repos to warrant special handling
@@ -697,7 +448,7 @@ func Repo(u string) (string, error) {
 			strings.Contains(parsedURL.Path, "issues")) {
 		return fmt.Sprintf("%s://%s%s", parsedURL.Scheme,
 				parsedURL.Hostname(),
-				strings.TrimSuffix(strings.Split(parsedURL.Path, "/-/")[0], "/")),
+				strings.Split(parsedURL.Path, "/-/")[0]),
 			nil
 	}
 
@@ -860,7 +611,17 @@ func ValidateAndCanonicalizeLink(link string) (canonicalLink string, err error) 
 	}
 	backoff := retry.NewExponential(1 * time.Second)
 	if err := retry.Do(context.Background(), retry.WithMaxRetries(3, backoff), func(ctx context.Context) error {
-		resp, err := http.Head(link)
+		req, err := http.NewRequest("HEAD", link, nil)
+		if err != nil {
+			return err
+		}
+
+		// security.alpinelinux.org responds with text/html content.
+		// default HEAD request in Go does not provide any Accept headers, causing a 406 response.
+		req.Header.Set("Accept", "text/html")
+
+		// Send the request
+		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			return err
 		}

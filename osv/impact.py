@@ -24,6 +24,7 @@ import traceback
 
 from google.cloud import ndb
 import pygit2
+import pygit2.enums
 
 from . import ecosystems
 from . import repos
@@ -351,8 +352,9 @@ def get_commit_and_tag_list(repo,
   logging.info('Getting commits %s..%s from %s', start_commit, end_commit,
                str(repo_url or 'UNKNOWN_REPO_URL'))
   try:
-    walker = repo.walk(end_commit,
-                       pygit2.GIT_SORT_TOPOLOGICAL | pygit2.GIT_SORT_REVERSE)
+    walker = repo.walk(
+        end_commit,
+        pygit2.enums.SortMode.TOPOLOGICAL | pygit2.enums.SortMode.REVERSE)
   except KeyError as e:
     raise ImpactError('Invalid commit.') from e
 
@@ -609,7 +611,7 @@ def analyze(vulnerability: vulnerability_pb2.Vulnerability,
 
   The behaviour varies by the vulnerability's affected field.
 
-  If there's package information for a supported ecosystem, versions are
+  If there's package information for a supported ecosystem, versions may be
   enumerated.
   If there's GIT ranges and analyze_git and versions_from_repo are True,
   versions are enumerated from the associated Git repo.
@@ -651,9 +653,12 @@ def analyze(vulnerability: vulnerability_pb2.Vulnerability,
             # Allow non-retryable enumeration errors to occur (e.g. if the
             # package no longer exists).
             pass
+          except NotImplementedError:
+            # Some ecosystems support ordering but don't support enumeration.
+            pass
         else:
-          logging.warning('No ecosystem helpers implemented for %s',
-                          affected.package.ecosystem)
+          logging.warning('No ecosystem helpers implemented for %s: %s',
+                          affected.package.ecosystem, vulnerability.id)
 
       new_git_versions = set()
       new_introduced = set()
@@ -663,9 +668,13 @@ def analyze(vulnerability: vulnerability_pb2.Vulnerability,
       if (analyze_git and
           affected_range.type == vulnerability_pb2.Range.Type.GIT):
         repo_analyzer = RepoAnalyzer(detect_cherrypicks=detect_cherrypicks)
-        _analyze_git_ranges(repo_analyzer, checkout_path, affected_range,
-                            new_git_versions, commits, new_introduced,
-                            new_fixed)
+        try:
+          _analyze_git_ranges(repo_analyzer, checkout_path, affected_range,
+                              new_git_versions, commits, new_introduced,
+                              new_fixed)
+        except Exception as e:
+          e.add_note(f'Happened analyzing {vulnerability.id}')
+          raise
 
       # Add additional versions derived from commits and tags.
       if versions_from_repo:

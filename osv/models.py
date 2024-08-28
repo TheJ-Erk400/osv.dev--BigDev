@@ -15,6 +15,7 @@
 
 import datetime
 import enum
+import logging
 import re
 import os
 
@@ -34,6 +35,8 @@ from . import sources
 from . import vulnerability_pb2
 
 SCHEMA_VERSION = '1.6.0'
+
+_MAX_GIT_VERSIONS_TO_INDEX = 5000
 
 
 def _check_valid_severity(prop, value):
@@ -375,6 +378,17 @@ class Bug(ndb.Model):
         if pkg.package.ecosystem
     }
 
+    # Only attempt to add the Git ecosystem if
+    # there are no existing ecosystems present
+    if not ecosystems_set:
+      for pkg in self.affected_packages:
+        for r in pkg.ranges:
+          if r.type == 'GIT':
+            ecosystems_set.add('GIT')
+            break
+        if 'GIT' in ecosystems_set:
+          break
+
     # For all ecosystems that specify a specific version with colon,
     # also add the base name
     ecosystems_set.update({ecosystems.normalize(x) for x in ecosystems_set})
@@ -394,6 +408,15 @@ class Bug(ndb.Model):
     for alias in self.aliases:
       search_indices.update(self._tokenize(alias))
 
+    for affected_package in self.affected_packages:
+      for affected_range in affected_package.ranges:
+        if affected_range.repo_url and affected_range.repo_url != '':
+          url_no_https = affected_range.repo_url.split('//')[1]  # remove https
+          repo_url_indices = url_no_https.split('/')[1:]  # remove domain
+          repo_url_indices.append(affected_range.repo_url)  # add full url
+          repo_url_indices.append(url_no_https)  # add url without https://
+          search_indices.update(repo_url_indices)
+
     self.search_indices = list(set(search_indices))
     self.search_indices.sort()
 
@@ -409,11 +432,25 @@ class Bug(ndb.Model):
         # No need to normalize if the ecosystem is supported.
         self.affected_fuzzy.extend(affected_package.versions)
       else:
-        self.affected_fuzzy.extend(
-            bug.normalize_tags(
-                _maybe_strip_repo_prefixes(
-                    affected_package.versions,
-                    [range.repo_url for range in affected_package.ranges])))
+        if (not affected_package.package.ecosystem and
+            len(affected_package.versions) > _MAX_GIT_VERSIONS_TO_INDEX):
+          # Assume that if there is no ecosystem specified, then these versions
+          # were enumerated from Git.
+          #
+          # Mitigate cases where the Git repo tag matching results in too many
+          # versions to index for Datastore.
+          # It's OK to do this because the primary intended matching mechanism
+          # for Git is via commit hash matching instead.
+          logging.info(
+              'Skipping indexing of git versions for %s '
+              'as there are too many (%s).', self.db_id,
+              len(affected_package.versions))
+        else:
+          self.affected_fuzzy.extend(
+              bug.normalize_tags(
+                  _maybe_strip_repo_prefixes(
+                      affected_package.versions,
+                      [range.repo_url for range in affected_package.ranges])))
 
       self.has_affected |= bool(affected_package.versions)
 
@@ -456,12 +493,12 @@ class Bug(ndb.Model):
       if not source_repo:
         raise ValueError(f'Invalid source {self.source}')
 
-      if source_repo.db_prefix and self.db_id.startswith(source_repo.db_prefix):
-        key_id = self.db_id
-      else:
-        key_id = f'{self.source}:{self.db_id}'
+      if source_repo.db_prefix and not any(
+          self.db_id.startswith(prefix) for prefix in source_repo.db_prefix):
+        raise ValueError(
+            f'{self.db_id} has invalid prefix for source {self.source}')
 
-      self.key = ndb.Key(Bug, key_id)
+      self.key = ndb.Key(Bug, self.db_id)
 
     if self.withdrawn:
       self.status = bug.BugStatus.INVALID
@@ -764,6 +801,7 @@ class SourceRepositoryType(enum.IntEnum):
   """SourceRepository type."""
   GIT = 0
   BUCKET = 1
+  REST_ENDPOINT = 2
 
 
 class SourceRepository(ndb.Model):
@@ -778,6 +816,8 @@ class SourceRepository(ndb.Model):
   repo_username = ndb.StringProperty()
   # Optional branch for repo for SourceRepositoryType.GIT.
   repo_branch = ndb.StringProperty()
+  # The API endpoint for SourceRepositoryType.REST_ENDPOINT.
+  rest_api_url = ndb.StringProperty()
   # Bucket name for SourceRepositoryType.BUCKET.
   bucket = ndb.StringProperty()
   # Vulnerability data not under this path is ignored by the importer.
@@ -794,7 +834,7 @@ class SourceRepository(ndb.Model):
   extension = ndb.StringProperty(default='.yaml')
   # Key path within each file to store the vulnerability.
   key_path = ndb.StringProperty()
-  # It true, don't analyze any Git ranges.
+  # If true, don't analyze any Git ranges.
   ignore_git = ndb.BooleanProperty(default=False)
   # Whether to detect cherypicks or not (slow for large repos).
   detect_cherrypicks = ndb.BooleanProperty(default=True)
@@ -808,7 +848,7 @@ class SourceRepository(ndb.Model):
   human_link = ndb.StringProperty()
   # DB prefix, if the database allocates its own.
   # https://ossf.github.io/osv-schema/#id-modified-fields
-  db_prefix = ndb.StringProperty()
+  db_prefix = ndb.StringProperty(repeated=True)
 
   def ignore_file(self, file_path):
     """Return whether or not we should be ignoring a file."""

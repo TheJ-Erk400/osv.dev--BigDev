@@ -20,6 +20,7 @@ import logging
 import os
 import re
 import redis
+import requests
 import resource
 import shutil
 import subprocess
@@ -31,6 +32,7 @@ import google.cloud.exceptions
 from google.cloud import ndb
 from google.cloud import pubsub_v1
 from google.cloud import storage
+from google.cloud.storage import retry
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 import osv
@@ -44,18 +46,7 @@ DEFAULT_WORK_DIR = '/work'
 OSS_FUZZ_GIT_URL = 'https://github.com/google/oss-fuzz.git'
 TASK_SUBSCRIPTION = 'tasks'
 MAX_LEASE_DURATION = 6 * 60 * 60  # 4 hours.
-
-# Large projects which take way too long to build.
-# TODO(ochang): Don't hardcode this.
-PROJECT_DENYLIST = {
-    'ffmpeg',
-    'imagemagick',
-    'libreoffice',
-}
-
-REPO_DENYLIST = {
-    'https://github.com/google/AFL.git',
-}
+_TIMEOUT_SECONDS = 60
 
 _ECOSYSTEM_PUSH_TOPICS = {
     'PyPI': 'pypi-bridge',
@@ -370,10 +361,13 @@ class TaskRunner:
 
       current_sha256 = osv.sha256(vuln_path)
     elif source_repo.type == osv.SourceRepositoryType.BUCKET:
+      if deleted:
+        self._handle_deleted(source_repo, path)
+        return
       storage_client = storage.Client()
       bucket = storage_client.bucket(source_repo.bucket)
       try:
-        blob = bucket.blob(path).download_as_bytes()
+        blob = bucket.blob(path).download_as_bytes(retry=retry.DEFAULT_RETRY)
       except google.cloud.exceptions.NotFound:
         logging.exception('Bucket path %s does not exist.', path)
         return
@@ -389,6 +383,20 @@ class TaskRunner:
         return
 
       repo = None
+    elif source_repo.type == osv.SourceRepositoryType.REST_ENDPOINT:
+      vulnerabilities = []
+      request = requests.get(source_repo.link + path, timeout=_TIMEOUT_SECONDS)
+      if request.status_code != 200:
+        logging.error('Failed to fetch REST API: %s', request.status_code)
+        return
+      vuln = request.json()
+      try:
+        vulnerabilities.append(osv.parse_vulnerability_from_dict(vuln))
+      except Exception as e:
+        logging.exception('Failed to parse %s:%s', vuln['id'], e)
+      current_sha256 = osv.sha256_bytes(request.text.encode())
+      repo = None
+
     else:
       raise RuntimeError('Unsupported SourceRepository type.')
 
@@ -402,7 +410,14 @@ class TaskRunner:
       self._do_update(source_repo, repo, vulnerability, path, original_sha256)
 
   def _handle_deleted(self, source_repo, vuln_path):
-    """Handle deleted source."""
+    """Handle existing bugs that have been subsequently deleted at their source.
+
+    Args:
+      source_repo: Source repository.
+      vuln_path: Path to vulnerability.
+
+    This marks the Bug as INVALID and as withdrawn.
+    """
     vuln_id = os.path.splitext(os.path.basename(vuln_path))[0]
     bug = osv.Bug.get_by_id(vuln_id)
     if not bug:
@@ -411,12 +426,13 @@ class TaskRunner:
 
     bug_source_path = osv.source_path(source_repo, bug)
     if bug_source_path != vuln_path:
-      logging.info('Request path %s does not match %s, not marking as invalid.',
-                   vuln_path, bug_source_path)
+      logging.error('Request path %s does not match %s, aborting.', vuln_path,
+                    bug_source_path)
       return
 
-    logging.info('Marking %s as invalid.', vuln_id)
+    logging.info('Marking %s as invalid and withdrawn.', vuln_id)
     bug.status = osv.BugStatus.INVALID
+    bug.withdrawn = datetime.datetime.utcnow()
     bug.put()
 
   def _push_new_ranges_and_versions(self, source_repo, repo, vulnerability,
@@ -501,7 +517,6 @@ class TaskRunner:
     bug.update_from_vulnerability(vulnerability)
     bug.public = True
     bug.import_last_modified = orig_modified_date
-
     # OSS-Fuzz sourced bugs use a different format for source_id.
     if source_repo.name != 'oss-fuzz' or not bug.source_id:
       bug.source_id = f'{source_repo.name}:{relative_path}'
@@ -515,7 +530,6 @@ class TaskRunner:
       logging.info('%s does not affect any packages. Marking as invalid.',
                    vulnerability.id)
       bug.status = osv.BugStatus.INVALID
-
     bug.put()
 
     osv.update_affected_commits(bug.key.id(), result.commits, bug.public)

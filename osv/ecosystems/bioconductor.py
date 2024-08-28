@@ -44,6 +44,10 @@ class Bioconductor(Ecosystem):
 
   def sort_key(self, version):
     """Sort key."""
+    if not semver_index.is_valid(version):
+      # If version is not valid, it is most likely an invalid input
+      # version then sort it to the last/largest element
+      return semver_index.parse('999999')
     return semver_index.parse(version)
 
   def _enumerate_versions(self,
@@ -57,6 +61,12 @@ class Bioconductor(Ecosystem):
     """Helper method to enumerate versions from a specific URL."""
 
     versions = []
+    # Currently breaking on 3.19,
+    # see https://github.com/google/osv.dev/pull/1477/files#r1575458933
+    try:
+      bioc_versions.remove('3.19')
+    except ValueError:
+      pass
     for version in bioc_versions:
       response = requests.get(
           url.format(package=package, bioc_version=version),
